@@ -505,12 +505,12 @@
   const MM_PER_IN = 25.4;
   const PX_PER_MM = DPI / MM_PER_IN;
 
-  // Más tamaños (podés ajustar márgenes a gusto)
+  // Más tamaños
   const SIZES = {
-    "50x70":  { wmm:50,  hmm:70,  name:"5×7 cm",    photo:{mlr:5,  mt:6,  mb:12} },
-    "60x80":  { wmm:60,  hmm:80,  name:"6×8 cm",    photo:{mlr:5.5,mt:6.5,mb:13} },
-    "70x90":  { wmm:70,  hmm:90,  name:"7×9 cm",    photo:{mlr:6,  mt:7,  mb:16} },
-    "90x110": { wmm:90,  hmm:110, name:"9×11 cm",   photo:{mlr:7,  mt:8,  mb:18} }
+    "50x70":  { wmm:50,  hmm:70,  name:"5×7 cm",  photo:{mlr:5,  mt:6,  mb:12} },
+    "60x80":  { wmm:60,  hmm:80,  name:"6×8 cm",  photo:{mlr:5.5,mt:6.5,mb:13} },
+    "70x90":  { wmm:70,  hmm:90,  name:"7×9 cm",  photo:{mlr:6,  mt:7,  mb:16} },
+    "90x110": { wmm:90,  hmm:110, name:"9×11 cm", photo:{mlr:7,  mt:8,  mb:18} }
   };
 
   function mm2px(mm){ return Math.round(mm * PX_PER_MM); }
@@ -526,10 +526,10 @@
     });
   }
 
-  // Helpers: SVG -> Image
+  // SVG -> Image
   function svgToImg(svgString){
     return new Promise((resolve, reject)=>{
-      const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const blob = new Blob([svgString], { type:"image/svg+xml;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = ()=> { URL.revokeObjectURL(url); resolve(img); };
@@ -542,11 +542,11 @@
   // Stickers (built-in)
   // =======================
   const STICKERS = {
-    none: { label: "Sin sticker", kind: "none" },
-    spotify: { label: "Spotify (ejemplo)", kind: "builtin", key: "spotify" },
-    heart: { label: "Corazón", kind: "builtin", key: "heart" },
-    birthday: { label: "Cumple", kind: "builtin", key: "birthday" },
-    upload: { label: "Subir PNG", kind: "upload" }
+    none:     { label:"Sin sticker",      kind:"none" },
+    spotify:  { label:"Spotify (ejemplo)",kind:"builtin", key:"spotify" },
+    heart:    { label:"Corazón",          kind:"builtin", key:"heart" },
+    birthday: { label:"Cumple",           kind:"builtin", key:"birthday" },
+    upload:   { label:"Subir PNG",        kind:"upload" }
   };
 
   const BUILTIN_SVGS = {
@@ -572,15 +572,12 @@
     spotify: `
       <svg xmlns="http://www.w3.org/2000/svg" width="520" height="110" viewBox="0 0 520 110">
         <rect width="520" height="110" rx="16" fill="#ffffff"/>
-        <!-- Logo tipo spotify -->
         <g transform="translate(22,18)">
           <circle cx="37" cy="37" r="32" fill="#1DB954"/>
           <path d="M23 32c18-6 38-4 52 4" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".9"/>
           <path d="M25 44c14-4 30-3 41 3" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".85"/>
           <path d="M27 56c10-3 22-2 30 2" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"/>
         </g>
-
-        <!-- “Código” estilo spotify (placeholder) -->
         <g transform="translate(110,22)" fill="#0b1324">
           <rect x="0"   y="10" width="6"  height="56" rx="3"/>
           <rect x="14"  y="0"  width="6"  height="76" rx="3"/>
@@ -613,8 +610,7 @@
   const BUILTIN_IMAGES = { heart:null, birthday:null, spotify:null };
 
   async function ensureBuiltinStickers(){
-    const keys = Object.keys(BUILTIN_SVGS);
-    for(const k of keys){
+    for(const k of Object.keys(BUILTIN_SVGS)){
       if(BUILTIN_IMAGES[k]) continue;
       BUILTIN_IMAGES[k] = await svgToImg(BUILTIN_SVGS[k]);
     }
@@ -647,12 +643,13 @@
   const $pageInfo = document.getElementById('pageInfo');
   const $refreshPreview = document.getElementById('refreshPreview');
 
-  document.getElementById('yy').textContent = new Date().getFullYear();
+  const $yy = document.getElementById('yy');
+  if($yy) $yy.textContent = new Date().getFullYear();
 
   function enableButtons(){
     const has = items.length > 0;
-    $clearAll.disabled = !has;
-    $exportPdf.disabled = !has;
+    if($clearAll) $clearAll.disabled = !has;
+    if($exportPdf) $exportPdf.disabled = !has;
   }
 
   // =======================
@@ -678,35 +675,44 @@
   }
 
   function drawFooterSticker(ctx, it, W, H, MB){
-    // Dibuja sticker centrado en el área inferior (MB)
     if(!it.footer || it.footer.mode === "none") return;
 
     let img = null;
-
     if(it.footer.mode === "builtin"){
       img = BUILTIN_IMAGES[it.footer.key] || null;
-    } else if(it.footer.mode === "upload"){
+    }else if(it.footer.mode === "upload"){
       img = it.footer.img || null;
     }
-
     if(!img) return;
 
-    // Área del pie: desde (H-MB) hasta H
     const pad = mm2px(2);
     const areaX = pad;
     const areaY = H - MB + pad;
     const areaW = W - pad*2;
     const areaH = MB - pad*2;
 
-    // Mantener proporción
-    const scale = Math.min(areaW / img.width, areaH / img.height);
+    if(typeof it.footer.scale !== "number") it.footer.scale = 1.0;
+    if(typeof it.footer.posX !== "number") it.footer.posX = 0.5;
+    if(typeof it.footer.posY !== "number") it.footer.posY = 0.5;
+
+    const base = Math.min(areaW / img.width, areaH / img.height);
+    const scale = base * it.footer.scale;
+
     const dw = img.width * scale;
     const dh = img.height * scale;
 
-    const dx = areaX + (areaW - dw)/2;
-    const dy = areaY + (areaH - dh)/2;
+    const cx = areaX + areaW * it.footer.posX;
+    const cy = areaY + areaH * it.footer.posY;
+
+    let dx = cx - dw/2;
+    let dy = cy - dh/2;
+
+    dx = clamp(dx, areaX, areaX + areaW - dw);
+    dy = clamp(dy, areaY, areaY + areaH - dh);
 
     ctx.drawImage(img, dx, dy, dw, dh);
+
+    it.footer._bbox = { x:dx, y:dy, w:dw, h:dh, areaX, areaY, areaW, areaH };
   }
 
   function drawItem(it){
@@ -720,11 +726,11 @@
     const ctx = it.ctx;
     ctx.clearRect(0,0,W,H);
 
-    // Fondo blanco
+    // fondo
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0,0,W,H);
 
-    // Área foto (clip)
+    // foto (clip)
     const x = MLR, y = MT;
     ctx.save();
     ctx.beginPath();
@@ -743,12 +749,12 @@
     ctx.drawImage(it.img, cx - drawW/2, cy - drawH/2, drawW, drawH);
     ctx.restore();
 
-    // Marco interno
+    // marco interno
     ctx.strokeStyle = "#111827";
     ctx.lineWidth = mm2px(0.6);
     ctx.strokeRect(x, y, photoW, photoH);
 
-    // Pie (texto)
+    // texto
     const cap = (it.caption || "").trim();
     if(cap){
       const fontPx = Math.round(3.5 * PX_PER_MM);
@@ -759,10 +765,10 @@
       ctx.fillText(cap, W/2, H - MB/2);
     }
 
-    // Sticker del pie (encima del texto si querés, o podés cambiar el orden)
+    // sticker
     drawFooterSticker(ctx, it, W, H, MB);
 
-    // Marco externo
+    // marco externo
     ctx.strokeStyle = "#111827";
     ctx.lineWidth = mm2px(0.5);
     ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, W-ctx.lineWidth, H-ctx.lineWidth);
@@ -772,27 +778,21 @@
   // Crear tarjeta
   // =======================
   function buildSizeOptionsHTML(){
-    return Object.entries(SIZES)
-      .map(([k,v]) => `<option value="${k}">${v.name}</option>`)
-      .join("");
+    return Object.entries(SIZES).map(([k,v]) => `<option value="${k}">${v.name}</option>`).join("");
   }
 
   function buildStickerOptionsHTML(){
-    return Object.entries(STICKERS)
-      .map(([k,v]) => `<option value="${k}">${v.label}</option>`)
-      .join("");
+    return Object.entries(STICKERS).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join("");
   }
 
   function syncGlobalPreviewOptions(){
     if(!$previewSize) return;
     $previewSize.innerHTML = buildSizeOptionsHTML();
-    // Default
     if(!SIZES[$previewSize.value]) $previewSize.value = "50x70";
   }
 
   function createCard({img, url}){
     const id = ++seq;
-
     const sizeKey = "50x70";
     const { photoW, photoH } = getDims(sizeKey);
     const baseScale = coverScale(img.naturalWidth, img.naturalHeight, photoW, photoH);
@@ -806,7 +806,7 @@
       offX: 0,
       offY: 0,
       caption: "",
-      footer: { mode: "none", key: null, img: null, url: null }
+      footer: { mode:"none", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null }
     };
 
     const card = document.createElement('div');
@@ -833,13 +833,13 @@
     canvas.width = mm2px(SIZES[sizeKey].wmm);
     canvas.height = mm2px(SIZES[sizeKey].hmm);
 
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const ctx = canvas.getContext('2d', { willReadFrequently:true });
     preview.appendChild(canvas);
 
     const controls = document.createElement('div');
     controls.className = 'row g-2';
 
-    // Tamaño
+    // tamaño
     const sizeCol = document.createElement('div');
     sizeCol.className = 'col-12 col-md-6';
     sizeCol.innerHTML = `
@@ -849,7 +849,7 @@
     const sizeSel = sizeCol.querySelector('select');
     sizeSel.value = sizeKey;
 
-    // Caption
+    // texto
     const capCol = document.createElement('div');
     capCol.className = 'col-12 col-md-6';
     capCol.innerHTML = `
@@ -858,23 +858,53 @@
     `;
     const capInput = capCol.querySelector('input');
 
-    // Sticker select + upload
+    // stickers + sliders
     const footerCol = document.createElement('div');
     footerCol.className = 'col-12';
     footerCol.innerHTML = `
       <label class="form-label fw-semibold">Sticker en pie (opcional)</label>
-      <div class="d-flex flex-wrap gap-2 align-items-center">
+
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
         <select class="form-select form-select-sm" style="max-width:260px">
           ${buildStickerOptionsHTML()}
         </select>
-        <input class="form-control form-control-sm" type="file" accept="image/png" style="max-width:260px; display:none" />
-        <span class="small-note">Subí PNG si elegís “Subir PNG”.</span>
+
+        <input class="form-control form-control-sm" type="file" accept="image/png"
+          style="max-width:260px; display:none" />
+
+        <button class="btn btn-outline-secondary btn-sm" type="button">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset sticker
+        </button>
       </div>
+
+      <div class="row g-2">
+        <div class="col-12 col-md-4">
+          <label class="small-note d-block mb-1">Tamaño</label>
+          <input type="range" class="form-range" min="0.3" max="2.2" step="0.01" value="1.00">
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="small-note d-block mb-1">Posición X</label>
+          <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.50">
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="small-note d-block mb-1">Posición Y</label>
+          <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.50">
+        </div>
+      </div>
+
+      <div class="small-note mt-1">Tip: podés arrastrar el sticker dentro del pie.</div>
     `;
+
     const footerSel = footerCol.querySelector('select');
     const footerUpload = footerCol.querySelector('input[type="file"]');
+    const resetStickerBtn = footerCol.querySelector('button');
 
-    // Zoom
+    const ranges = footerCol.querySelectorAll('input[type="range"]');
+    const stScale = ranges[0];
+    const stX = ranges[1];
+    const stY = ranges[2];
+
+    // zoom
     const zoomCol = document.createElement('div');
     zoomCol.className = 'col-12';
     zoomCol.innerHTML = `
@@ -889,14 +919,32 @@
     const recBtn = zoomCol.querySelector('button');
 
     controls.append(sizeCol, capCol, footerCol, zoomCol);
-
     card.append(topRow, preview, controls);
     $cards.appendChild(card);
 
     it.canvas = canvas;
     it.ctx = ctx;
 
-    // Eventos
+    // helpers sliders sticker
+    function applyFooterControlsToItem(){
+      if(!it.footer) return;
+      it.footer.scale = parseFloat(stScale.value);
+      it.footer.posX  = parseFloat(stX.value);
+      it.footer.posY  = parseFloat(stY.value);
+    }
+    function syncControlsFromItem(){
+      stScale.value = (it.footer?.scale ?? 1.0).toFixed(2);
+      stX.value     = (it.footer?.posX  ?? 0.5).toFixed(2);
+      stY.value     = (it.footer?.posY  ?? 0.5).toFixed(2);
+    }
+    function setFooterDefaults(){
+      it.footer.scale = 1.0;
+      it.footer.posX = 0.5;
+      it.footer.posY = 0.5;
+      syncControlsFromItem();
+    }
+
+    // eventos tamaño
     sizeSel.addEventListener('change', ()=>{
       it.sizeKey = sizeSel.value;
 
@@ -916,30 +964,31 @@
       drawA4Preview();
     });
 
+    // texto
     capInput.addEventListener('input', ()=>{
       it.caption = capInput.value;
       drawItem(it);
       drawA4Preview();
     });
 
+    // stickers
     footerSel.addEventListener('change', async ()=>{
       const opt = footerSel.value;
 
-      // reset upload input
       footerUpload.value = "";
       footerUpload.style.display = (opt === "upload") ? "block" : "none";
 
       if(opt === "none"){
-        it.footer = { mode:"none", key:null, img:null, url:null };
-      } else if(opt === "upload"){
-        it.footer = { mode:"upload", key:null, img:null, url:null };
-      } else {
-        // builtin
+        it.footer = { mode:"none", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
+      }else if(opt === "upload"){
+        it.footer = { mode:"upload", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
+      }else{
         await ensureBuiltinStickers();
         const cfg = STICKERS[opt];
-        it.footer = { mode:"builtin", key: cfg.key, img:null, url:null };
+        it.footer = { mode:"builtin", key:cfg.key, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
       }
 
+      syncControlsFromItem();
       drawItem(it);
       drawA4Preview();
     });
@@ -953,18 +1002,47 @@
         return;
       }
 
-      // liberar anterior
       if(it.footer?.url){
         try{ URL.revokeObjectURL(it.footer.url); }catch(_){}
       }
 
       const { img:upImg, url:upUrl } = await loadImageFromFile(f);
-      it.footer = { mode:"upload", key:null, img:upImg, url:upUrl };
 
+      const scale = it.footer?.scale ?? 1.0;
+      const posX  = it.footer?.posX ?? 0.5;
+      const posY  = it.footer?.posY ?? 0.5;
+
+      it.footer = { mode:"upload", key:null, img:upImg, url:upUrl, scale, posX, posY, _bbox:null };
+
+      syncControlsFromItem();
       drawItem(it);
       drawA4Preview();
     });
 
+    // sliders sticker
+    stScale.addEventListener('input', ()=>{
+      applyFooterControlsToItem();
+      drawItem(it);
+      drawA4Preview();
+    });
+    stX.addEventListener('input', ()=>{
+      applyFooterControlsToItem();
+      drawItem(it);
+      drawA4Preview();
+    });
+    stY.addEventListener('input', ()=>{
+      applyFooterControlsToItem();
+      drawItem(it);
+      drawA4Preview();
+    });
+
+    resetStickerBtn.addEventListener('click', ()=>{
+      setFooterDefaults();
+      drawItem(it);
+      drawA4Preview();
+    });
+
+    // zoom
     zoomRange.addEventListener('input', ()=>{
       it.scale = parseFloat(zoomRange.value);
       drawItem(it);
@@ -980,22 +1058,45 @@
       drawA4Preview();
     });
 
+    // eliminar
     delBtn.addEventListener('click', ()=> removeItem(it.id));
 
-    // Drag para mover encuadre
+    // Drag para mover encuadre + drag sticker
     let dragging = false;
+    let draggingSticker = false;
     let lastX = 0, lastY = 0;
 
     canvas.addEventListener('mousedown', (e)=>{
+      const rect = canvas.getBoundingClientRect();
+      const rx = canvas.width / rect.width;
+      const ry = canvas.height / rect.height;
+
+      const mx = (e.clientX - rect.left) * rx;
+      const my = (e.clientY - rect.top) * ry;
+
+      const bb = it.footer?._bbox;
+      if(bb && mx >= bb.x && mx <= bb.x + bb.w && my >= bb.y && my <= bb.y + bb.h){
+        draggingSticker = true;
+        dragging = false;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        e.preventDefault();
+        return;
+      }
+
       dragging = true;
+      draggingSticker = false;
       lastX = e.clientX;
       lastY = e.clientY;
     });
 
-    window.addEventListener('mouseup', ()=> dragging = false);
+    window.addEventListener('mouseup', ()=>{
+      dragging = false;
+      draggingSticker = false;
+    });
 
     window.addEventListener('mousemove', (e)=>{
-      if(!dragging) return;
+      if(!dragging && !draggingSticker) return;
 
       const rect = canvas.getBoundingClientRect();
       const rx = canvas.width / rect.width;
@@ -1007,6 +1108,25 @@
       lastX = e.clientX;
       lastY = e.clientY;
 
+      if(draggingSticker){
+        const bb = it.footer?._bbox;
+        if(!bb) return;
+
+        const centerX = (bb.x + bb.w/2 + dx - bb.areaX) / bb.areaW;
+        const centerY = (bb.y + bb.h/2 + dy - bb.areaY) / bb.areaH;
+
+        it.footer.posX = clamp(centerX, 0, 1);
+        it.footer.posY = clamp(centerY, 0, 1);
+
+        stX.value = it.footer.posX.toFixed(2);
+        stY.value = it.footer.posY.toFixed(2);
+
+        drawItem(it);
+        drawA4Preview();
+        return;
+      }
+
+      // dragging foto
       it.offX += dx;
       it.offY += dy;
 
@@ -1023,7 +1143,7 @@
       drawA4Preview();
     }, { passive:false });
 
-    // Render inicial
+    // inicial
     drawItem(it);
 
     items.push(it);
@@ -1037,7 +1157,6 @@
     const idx = items.findIndex(x => x.id === id);
     if(idx < 0) return;
 
-    // liberar URLs
     try{ URL.revokeObjectURL(items[idx].url); }catch(_){}
     try{ if(items[idx].footer?.url) URL.revokeObjectURL(items[idx].footer.url); }catch(_){}
 
@@ -1052,41 +1171,43 @@
   }
 
   // =======================
-  // Carga de imágenes
+  // Carga imágenes
   // =======================
-  $files.addEventListener('change', async (e)=>{
-    await ensureBuiltinStickers(); // carga stickers 1 vez (sin bloquear el resto)
-    const files = Array.from(e.target.files || []);
-    for(const f of files){
-      if(!f.type.startsWith('image/')) continue;
-      const loaded = await loadImageFromFile(f);
-      createCard(loaded);
-    }
-    $files.value = '';
-  });
+  if($files){
+    $files.addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files || []);
+      for(const f of files){
+        if(!f.type.startsWith('image/')) continue;
+        const loaded = await loadImageFromFile(f);
+        createCard(loaded);
+      }
+      $files.value = '';
+    });
+  }
 
   // =======================
   // Vaciar
   // =======================
-  $clearAll.addEventListener('click', ()=>{
-    if(!confirm('¿Vaciar todas las fotos cargadas?')) return;
-    while(items.length){
-      const it = items.pop();
-      try{ URL.revokeObjectURL(it.url); }catch(_){}
-      try{ if(it.footer?.url) URL.revokeObjectURL(it.footer.url); }catch(_){}
-    }
-    $cards.innerHTML = '';
-    enableButtons();
-    currentPage = 0;
-    drawA4Preview();
-  });
+  if($clearAll){
+    $clearAll.addEventListener('click', ()=>{
+      if(!confirm('¿Vaciar todas las fotos cargadas?')) return;
+      while(items.length){
+        const it = items.pop();
+        try{ URL.revokeObjectURL(it.url); }catch(_){}
+        try{ if(it.footer?.url) URL.revokeObjectURL(it.footer.url); }catch(_){}
+      }
+      $cards.innerHTML = '';
+      enableButtons();
+      currentPage = 0;
+      drawA4Preview();
+    });
+  }
 
   // =======================
-  // Refresh manual (botón)
+  // Refresh manual
   // =======================
   if($refreshPreview){
     $refreshPreview.addEventListener('click', ()=>{
-      // Re-dibuja todas las tarjetas y la hoja
       for(const it of items) drawItem(it);
       drawA4Preview();
     });
@@ -1100,7 +1221,6 @@
       currentPage = Math.max(0, currentPage - 1);
       drawA4Preview();
     });
-
     $nextPage.addEventListener('click', ()=>{
       currentPage = currentPage + 1;
       drawA4Preview();
@@ -1110,15 +1230,14 @@
   // =======================
   // Previsualización A4
   // =======================
-  function syncAllSizeSelects(){
-    syncGlobalPreviewOptions();
-    // Nota: los selects de las tarjetas se generan al crear cada card
-  }
+  syncGlobalPreviewOptions();
 
-  $previewSize.addEventListener('change', ()=>{
-    currentPage = 0;
-    drawA4Preview();
-  });
+  if($previewSize){
+    $previewSize.addEventListener('change', ()=>{
+      currentPage = 0;
+      drawA4Preview();
+    });
+  }
 
   function drawA4Preview(){
     const A4_W = 210, A4_H = 297;
@@ -1128,7 +1247,6 @@
 
     a4ctx.clearRect(0,0,cw,ch);
 
-    // hoja
     a4ctx.fillStyle = "#ffffff";
     a4ctx.fillRect(0,0,cw,ch);
 
@@ -1136,7 +1254,7 @@
     a4ctx.lineWidth = 2;
     a4ctx.strokeRect(10,10,cw-20,ch-20);
 
-    const sizeKey = $previewSize.value;
+    const sizeKey = ($previewSize && $previewSize.value) ? $previewSize.value : "50x70";
     const s = SIZES[sizeKey] || SIZES["50x70"];
     const W = s.wmm, H = s.hmm;
 
@@ -1157,12 +1275,10 @@
 
     function mm2p(mm){ return 20 + mm * SCL; }
 
-    // título
     a4ctx.fillStyle = "#0f172a";
     a4ctx.font = "700 20px Arial";
     a4ctx.fillText(`A4 - Polaroids ${s.name}`, 24, 40);
 
-    // items de ese tamaño
     const list = items.filter(it => it.sizeKey === sizeKey);
 
     const perPage = COLS * ROWS;
@@ -1195,7 +1311,7 @@
         if(idx < pageItems.length){
           const it = pageItems[idx++];
           a4ctx.drawImage(it.canvas, px, py, pw, ph);
-        } else {
+        }else{
           a4ctx.fillStyle = "#f8fafc";
           a4ctx.fillRect(px, py, pw, ph);
           a4ctx.fillStyle = "#94a3b8";
@@ -1215,70 +1331,72 @@
   }
 
   // =======================
-  // PDF Export (agrupa por tamaño)
+  // PDF Export
   // =======================
-  $exportPdf.addEventListener('click', ()=>{
-    if(!items.length) return;
+  if($exportPdf){
+    $exportPdf.addEventListener('click', ()=>{
+      if(!items.length) return;
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit:'mm', format:'a4', compress:true });
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'mm', format:'a4', compress:true });
 
-    const A4_W = 210, A4_H = 297;
-    const GAP_X = 3, GAP_Y = 3;
+      const A4_W = 210, A4_H = 297;
+      const GAP_X = 3, GAP_Y = 3;
 
-    const groups = Object.keys(SIZES)
-      .map(key => ({ key, list: items.filter(i => i.sizeKey === key) }))
-      .filter(g => g.list.length > 0);
+      const groups = Object.keys(SIZES)
+        .map(key => ({ key, list: items.filter(i => i.sizeKey === key) }))
+        .filter(g => g.list.length > 0);
 
-    let firstPage = true;
+      let firstPage = true;
 
-    for(const g of groups){
-      const s = SIZES[g.key];
-      const W = s.wmm, H = s.hmm;
+      for(const g of groups){
+        const s = SIZES[g.key];
+        const W = s.wmm, H = s.hmm;
 
-      const COLS = Math.max(1, Math.floor((A4_W + GAP_X) / (W + GAP_X)));
-      const ROWS = Math.max(1, Math.floor((A4_H + GAP_Y) / (H + GAP_Y)));
+        const COLS = Math.max(1, Math.floor((A4_W + GAP_X) / (W + GAP_X)));
+        const ROWS = Math.max(1, Math.floor((A4_H + GAP_Y) / (H + GAP_Y)));
 
-      const usedW = COLS*W + (COLS-1)*GAP_X;
-      const usedH = ROWS*H + (ROWS-1)*GAP_Y;
+        const usedW = COLS*W + (COLS-1)*GAP_X;
+        const usedH = ROWS*H + (ROWS-1)*GAP_Y;
 
-      const startX = (A4_W - usedW)/2;
-      const startY = (A4_H - usedH)/2;
+        const startX = (A4_W - usedW)/2;
+        const startY = (A4_H - usedH)/2;
 
-      const perPage = COLS * ROWS;
-      const pages = Math.ceil(g.list.length / perPage);
+        const perPage = COLS * ROWS;
+        const pages = Math.ceil(g.list.length / perPage);
 
-      let idx = 0;
+        let idx = 0;
 
-      for(let p=0; p<pages; p++){
-        if(!firstPage) doc.addPage('a4','portrait');
-        firstPage = false;
+        for(let p=0; p<pages; p++){
+          if(!firstPage) doc.addPage('a4','portrait');
+          firstPage = false;
 
-        if($cropMarks.checked){
-          drawCropMarks(doc, startX, startY, W, H, GAP_X, GAP_Y, COLS, ROWS);
-        }
+          if($cropMarks && $cropMarks.checked){
+            drawCropMarks(doc, startX, startY, W, H, GAP_X, GAP_Y, COLS, ROWS);
+          }
 
-        for(let r=0; r<ROWS; r++){
-          for(let c=0; c<COLS; c++){
-            if(idx >= g.list.length) break;
+          for(let r=0; r<ROWS; r++){
+            for(let c=0; c<COLS; c++){
+              if(idx >= g.list.length) break;
 
-            const it = g.list[idx++];
-            const x = startX + c*(W + GAP_X);
-            const y = startY + r*(H + GAP_Y);
+              const it = g.list[idx++];
+              const x = startX + c*(W + GAP_X);
+              const y = startY + r*(H + GAP_Y);
 
-            const dataUrl = it.canvas.toDataURL('image/png', 1.0);
-            doc.addImage(dataUrl, 'PNG', x, y, W, H);
+              const dataUrl = it.canvas.toDataURL('image/png', 1.0);
+              doc.addImage(dataUrl, 'PNG', x, y, W, H);
 
-            doc.setDrawColor(17, 24, 39);
-            doc.setLineWidth(0.5);
-            doc.rect(x, y, W, H);
+              doc.setDrawColor(17, 24, 39);
+              doc.setLineWidth(0.5);
+              doc.rect(x, y, W, H);
+            }
           }
         }
       }
-    }
 
-    doc.save('kuami_polaroids_A4.pdf');
-  });
+      doc.save('kuami_polaroids_A4.pdf');
+    });
+  }
 
   function drawCropMarks(doc, startX, startY, W, H, gapX, gapY, cols, rows){
     const len = 3;
@@ -1299,15 +1417,19 @@
 
   // Init
   (async function init(){
-    syncAllSizeSelects();
+    syncGlobalPreviewOptions();
     await ensureBuiltinStickers();
+    enableButtons();
     drawA4Preview();
   })();
 
   // Navbar shrink
   const nav = document.querySelector('.navbar');
-  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
-  document.addEventListener('scroll', onScroll); onScroll();
+  if(nav){
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+    document.addEventListener('scroll', onScroll);
+    onScroll();
+  }
 </script>
 
 </body>
