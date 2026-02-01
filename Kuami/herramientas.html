@@ -505,7 +505,6 @@
   const MM_PER_IN = 25.4;
   const PX_PER_MM = DPI / MM_PER_IN;
 
-  // Más tamaños
   const SIZES = {
     "50x70":  { wmm:50,  hmm:70,  name:"5×7 cm",  photo:{mlr:5,  mt:6,  mb:12} },
     "60x80":  { wmm:60,  hmm:80,  name:"6×8 cm",  photo:{mlr:5.5,mt:6.5,mb:13} },
@@ -526,7 +525,6 @@
     });
   }
 
-  // SVG -> Image
   function svgToImg(svgString){
     return new Promise((resolve, reject)=>{
       const blob = new Blob([svgString], { type:"image/svg+xml;charset=utf-8" });
@@ -539,14 +537,21 @@
   }
 
   // =======================
-  // Stickers (built-in)
+  // Stickers built-in
   // =======================
   const STICKERS = {
-    none:     { label:"Sin sticker",      kind:"none" },
-    spotify:  { label:"Spotify (ejemplo)",kind:"builtin", key:"spotify" },
-    heart:    { label:"Corazón",          kind:"builtin", key:"heart" },
-    birthday: { label:"Cumple",           kind:"builtin", key:"birthday" },
-    upload:   { label:"Subir PNG",        kind:"upload" }
+    none:     { label:"Sin sticker", kind:"none" },
+    spotify:  { label:"Spotify (ejemplo)", kind:"builtin", key:"spotify" },
+    heart:    { label:"Corazón", kind:"builtin", key:"heart" },
+    birthday: { label:"Cumple", kind:"builtin", key:"birthday" },
+
+    ring:     { label:"Anillo", kind:"builtin", key:"ring" },
+    star:     { label:"Estrella", kind:"builtin", key:"star" },
+    camera:   { label:"Cámara", kind:"builtin", key:"camera" },
+    thanks:   { label:"Gracias", kind:"builtin", key:"thanks" },
+    wedding:  { label:"Boda", kind:"builtin", key:"wedding" },
+
+    upload:   { label:"Subir PNG", kind:"upload" }
   };
 
   const BUILTIN_SVGS = {
@@ -579,35 +584,70 @@
           <path d="M27 56c10-3 22-2 30 2" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"/>
         </g>
         <g transform="translate(110,22)" fill="#0b1324">
-          <rect x="0"   y="10" width="6"  height="56" rx="3"/>
-          <rect x="14"  y="0"  width="6"  height="76" rx="3"/>
-          <rect x="28"  y="18" width="6"  height="40" rx="3"/>
-          <rect x="42"  y="6"  width="6"  height="64" rx="3"/>
-          <rect x="56"  y="14" width="6"  height="50" rx="3"/>
-          <rect x="70"  y="2"  width="6"  height="72" rx="3"/>
-          <rect x="84"  y="20" width="6"  height="36" rx="3"/>
-          <rect x="98"  y="8"  width="6"  height="60" rx="3"/>
-          <rect x="112" y="0"  width="6"  height="76" rx="3"/>
-          <rect x="126" y="16" width="6"  height="44" rx="3"/>
-          <rect x="140" y="6"  width="6"  height="64" rx="3"/>
-          <rect x="154" y="22" width="6"  height="32" rx="3"/>
-          <rect x="168" y="0"  width="6"  height="76" rx="3"/>
-          <rect x="182" y="10" width="6"  height="56" rx="3"/>
-          <rect x="196" y="18" width="6"  height="40" rx="3"/>
-          <rect x="210" y="6"  width="6"  height="64" rx="3"/>
-          <rect x="224" y="14" width="6"  height="50" rx="3"/>
-          <rect x="238" y="2"  width="6"  height="72" rx="3"/>
-          <rect x="252" y="20" width="6"  height="36" rx="3"/>
-          <rect x="266" y="8"  width="6"  height="60" rx="3"/>
-          <rect x="280" y="0"  width="6"  height="76" rx="3"/>
-          <rect x="294" y="16" width="6"  height="44" rx="3"/>
-          <rect x="308" y="6"  width="6"  height="64" rx="3"/>
+          ${Array.from({length:26}).map((_,i)=>{
+            const x=i*14, h=[56,76,40,64,50,72,36,60,76,44,64,32,76,56,40,64,50,72,36,60,76,44,64,32,70,52][i];
+            const y=(76-h)/2;
+            return `<rect x="${x}" y="${y}" width="6" height="${h}" rx="3"/>`;
+          }).join("")}
         </g>
+      </svg>
+    `,
+    ring: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="260" height="80" viewBox="0 0 260 80">
+        <rect width="260" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,12)">
+          <circle cx="30" cy="38" r="18" fill="none" stroke="#d4af37" stroke-width="6"/>
+          <polygon points="30,6 38,18 30,22 22,18" fill="#7dd3fc" stroke="#0f172a" stroke-width="2"/>
+        </g>
+        <text x="86" y="50" font-family="Arial" font-size="26" font-weight="800" fill="#111827">Boda</text>
+      </svg>
+    `,
+    star: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80">
+        <rect width="240" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,12)">
+          <path d="M30 8l6 18h19l-15 11 6 18-16-11-16 11 6-18-15-11h19z"
+            fill="#fbbf24" stroke="#0f172a" stroke-width="2"/>
+        </g>
+        <text x="86" y="50" font-family="Arial" font-size="26" font-weight="800" fill="#111827">Top</text>
+      </svg>
+    `,
+    camera: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="280" height="80" viewBox="0 0 280 80">
+        <rect width="280" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,16)">
+          <rect x="0" y="10" width="64" height="40" rx="8" fill="#0f172a"/>
+          <rect x="12" y="2" width="18" height="12" rx="3" fill="#334155"/>
+          <circle cx="32" cy="30" r="12" fill="#e2e8f0"/>
+          <circle cx="32" cy="30" r="6" fill="#94a3b8"/>
+        </g>
+        <text x="92" y="50" font-family="Arial" font-size="24" font-weight="800" fill="#111827">Foto</text>
+      </svg>
+    `,
+    thanks: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80">
+        <rect width="320" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,14)">
+          <path d="M18 44c8 6 16 6 24 0" fill="none" stroke="#ef476f" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="12" cy="22" r="4" fill="#0f172a"/>
+          <circle cx="30" cy="22" r="4" fill="#0f172a"/>
+        </g>
+        <text x="86" y="50" font-family="Arial" font-size="26" font-weight="800" fill="#111827">Gracias</text>
+      </svg>
+    `,
+    wedding: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="360" height="80" viewBox="0 0 360 80">
+        <rect width="360" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,12)">
+          <path d="M16 52h44v-8H16v8zm4-14h36c0-10-6-18-18-18S20 28 20 38z" fill="#60a5fa"/>
+          <path d="M66 52h44v-8H66v8zm4-14h36c0-10-6-18-18-18S70 28 70 38z" fill="#fb7185"/>
+        </g>
+        <text x="136" y="50" font-family="Arial" font-size="26" font-weight="800" fill="#111827">Nuestra fecha</text>
       </svg>
     `
   };
 
-  const BUILTIN_IMAGES = { heart:null, birthday:null, spotify:null };
+  const BUILTIN_IMAGES = {};
 
   async function ensureBuiltinStickers(){
     for(const k of Object.keys(BUILTIN_SVGS)){
@@ -621,9 +661,10 @@
   // =======================
   const items = [];
   let seq = 0;
-
-  // Paginación preview A4
   let currentPage = 0;
+
+  // Preset global para "poner todos igual"
+  let globalStickerPreset = null; // {place, scale, posX, posY}
 
   // =======================
   // DOM
@@ -674,35 +715,51 @@
     return Math.max(photoW/imgW, photoH/imgH);
   }
 
-  function drawFooterSticker(ctx, it, W, H, MB){
-    if(!it.footer || it.footer.mode === "none") return;
+  function getStickerImage(st){
+    if(st.mode === "builtin") return BUILTIN_IMAGES[st.key] || null;
+    if(st.mode === "upload") return st.img || null;
+    return null;
+  }
 
-    let img = null;
-    if(it.footer.mode === "builtin"){
-      img = BUILTIN_IMAGES[it.footer.key] || null;
-    }else if(it.footer.mode === "upload"){
-      img = it.footer.img || null;
+  function getStickerArea(W,H,MB,photoRect, place){
+    const pad = mm2px(2);
+
+    if(place === "footer"){
+      const areaX = pad;
+      const areaY = H - MB + pad;
+      const areaW = W - pad*2;
+      const areaH = MB - pad*2;
+      return {areaX,areaY,areaW,areaH};
     }
+
+    // overphoto
+    const areaX = photoRect.x + pad;
+    const areaY = photoRect.y + pad;
+    const areaW = photoRect.w - pad*2;
+    const areaH = photoRect.h - pad*2;
+    return {areaX,areaY,areaW,areaH};
+  }
+
+  function drawSticker(ctx, it, st, W, H, MB, photoRect){
+    const img = getStickerImage(st);
     if(!img) return;
 
-    const pad = mm2px(2);
-    const areaX = pad;
-    const areaY = H - MB + pad;
-    const areaW = W - pad*2;
-    const areaH = MB - pad*2;
+    const place = st.place || "footer";
+    const {areaX,areaY,areaW,areaH} = getStickerArea(W,H,MB,photoRect, place);
 
-    if(typeof it.footer.scale !== "number") it.footer.scale = 1.0;
-    if(typeof it.footer.posX !== "number") it.footer.posX = 0.5;
-    if(typeof it.footer.posY !== "number") it.footer.posY = 0.5;
+    // defaults
+    if(typeof st.scale !== "number") st.scale = 1.0;
+    if(typeof st.posX !== "number") st.posX = 0.5;
+    if(typeof st.posY !== "number") st.posY = 0.5;
 
     const base = Math.min(areaW / img.width, areaH / img.height);
-    const scale = base * it.footer.scale;
+    const scale = base * st.scale;
 
     const dw = img.width * scale;
     const dh = img.height * scale;
 
-    const cx = areaX + areaW * it.footer.posX;
-    const cy = areaY + areaH * it.footer.posY;
+    const cx = areaX + areaW * st.posX;
+    const cy = areaY + areaH * st.posY;
 
     let dx = cx - dw/2;
     let dy = cy - dh/2;
@@ -712,7 +769,8 @@
 
     ctx.drawImage(img, dx, dy, dw, dh);
 
-    it.footer._bbox = { x:dx, y:dy, w:dw, h:dh, areaX, areaY, areaW, areaH };
+    // bbox para drag
+    st._bbox = { x:dx, y:dy, w:dw, h:dh, areaX, areaY, areaW, areaH };
   }
 
   function drawItem(it){
@@ -732,6 +790,8 @@
 
     // foto (clip)
     const x = MLR, y = MT;
+    const photoRect = { x, y, w: photoW, h: photoH };
+
     ctx.save();
     ctx.beginPath();
     ctx.rect(x,y,photoW,photoH);
@@ -765,8 +825,12 @@
       ctx.fillText(cap, W/2, H - MB/2);
     }
 
-    // sticker
-    drawFooterSticker(ctx, it, W, H, MB);
+    // stickers (orden de dibujo = orden del array)
+    if(Array.isArray(it.stickers)){
+      for(const st of it.stickers){
+        drawSticker(ctx, it, st, W, H, MB, photoRect);
+      }
+    }
 
     // marco externo
     ctx.strokeStyle = "#111827";
@@ -775,16 +839,14 @@
   }
 
   // =======================
-  // Crear tarjeta
+  // Crear tarjeta + UI stickers
   // =======================
   function buildSizeOptionsHTML(){
     return Object.entries(SIZES).map(([k,v]) => `<option value="${k}">${v.name}</option>`).join("");
   }
-
   function buildStickerOptionsHTML(){
     return Object.entries(STICKERS).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join("");
   }
-
   function syncGlobalPreviewOptions(){
     if(!$previewSize) return;
     $previewSize.innerHTML = buildSizeOptionsHTML();
@@ -806,7 +868,7 @@
       offX: 0,
       offY: 0,
       caption: "",
-      footer: { mode:"none", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null }
+      stickers: [] // [{id,mode,key,img,url,place,scale,posX,posY,_bbox}]
     };
 
     const card = document.createElement('div');
@@ -817,7 +879,7 @@
     topRow.className = 'd-flex justify-content-between align-items-center gap-2';
 
     const title = document.createElement('div');
-    title.innerHTML = `<div class="fw-semibold">Foto #${id}</div><div class="small-note">Elegí tamaño, encuadre y pie.</div>`;
+    title.innerHTML = `<div class="fw-semibold">Foto #${id}</div><div class="small-note">Tamaño, encuadre, texto y stickers.</div>`;
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn btn-outline-danger btn-sm';
@@ -839,7 +901,7 @@
     const controls = document.createElement('div');
     controls.className = 'row g-2';
 
-    // tamaño
+    // Tamaño
     const sizeCol = document.createElement('div');
     sizeCol.className = 'col-12 col-md-6';
     sizeCol.innerHTML = `
@@ -849,7 +911,7 @@
     const sizeSel = sizeCol.querySelector('select');
     sizeSel.value = sizeKey;
 
-    // texto
+    // Pie texto
     const capCol = document.createElement('div');
     capCol.className = 'col-12 col-md-6';
     capCol.innerHTML = `
@@ -858,53 +920,32 @@
     `;
     const capInput = capCol.querySelector('input');
 
-    // stickers + sliders
-    const footerCol = document.createElement('div');
-    footerCol.className = 'col-12';
-    footerCol.innerHTML = `
-      <label class="form-label fw-semibold">Sticker en pie (opcional)</label>
+    // Stickers UI (lista)
+    const stCol = document.createElement('div');
+    stCol.className = 'col-12';
+    stCol.innerHTML = `
+      <label class="form-label fw-semibold">Stickers</label>
 
       <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-        <select class="form-select form-select-sm" style="max-width:260px">
-          ${buildStickerOptionsHTML()}
-        </select>
-
-        <input class="form-control form-control-sm" type="file" accept="image/png"
-          style="max-width:260px; display:none" />
-
-        <button class="btn btn-outline-secondary btn-sm" type="button">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset sticker
+        <button class="btn btn-outline-primary btn-sm" type="button" id="addSticker">
+          <i class="bi bi-plus-circle"></i> Agregar sticker
         </button>
+
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="applyPreset" disabled>
+          Aplicar misma posición (preset)
+        </button>
+
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="setPreset" disabled>
+          Guardar preset desde seleccionado
+        </button>
+
+        <span class="small-note">Seleccioná un sticker para editar.</span>
       </div>
 
-      <div class="row g-2">
-        <div class="col-12 col-md-4">
-          <label class="small-note d-block mb-1">Tamaño</label>
-          <input type="range" class="form-range" min="0.3" max="2.2" step="0.01" value="1.00">
-        </div>
-        <div class="col-12 col-md-4">
-          <label class="small-note d-block mb-1">Posición X</label>
-          <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.50">
-        </div>
-        <div class="col-12 col-md-4">
-          <label class="small-note d-block mb-1">Posición Y</label>
-          <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.50">
-        </div>
-      </div>
-
-      <div class="small-note mt-1">Tip: podés arrastrar el sticker dentro del pie.</div>
+      <div id="stickerList" class="vstack gap-2"></div>
     `;
 
-    const footerSel = footerCol.querySelector('select');
-    const footerUpload = footerCol.querySelector('input[type="file"]');
-    const resetStickerBtn = footerCol.querySelector('button');
-
-    const ranges = footerCol.querySelectorAll('input[type="range"]');
-    const stScale = ranges[0];
-    const stX = ranges[1];
-    const stY = ranges[2];
-
-    // zoom
+    // Zoom
     const zoomCol = document.createElement('div');
     zoomCol.className = 'col-12';
     zoomCol.innerHTML = `
@@ -918,45 +959,364 @@
     const zoomRange = zoomCol.querySelector('input[type="range"]');
     const recBtn = zoomCol.querySelector('button');
 
-    controls.append(sizeCol, capCol, footerCol, zoomCol);
+    controls.append(sizeCol, capCol, stCol, zoomCol);
     card.append(topRow, preview, controls);
     $cards.appendChild(card);
 
     it.canvas = canvas;
     it.ctx = ctx;
 
-    // helpers sliders sticker
-    function applyFooterControlsToItem(){
-      if(!it.footer) return;
-      it.footer.scale = parseFloat(stScale.value);
-      it.footer.posX  = parseFloat(stX.value);
-      it.footer.posY  = parseFloat(stY.value);
-    }
-    function syncControlsFromItem(){
-      stScale.value = (it.footer?.scale ?? 1.0).toFixed(2);
-      stX.value     = (it.footer?.posX  ?? 0.5).toFixed(2);
-      stY.value     = (it.footer?.posY  ?? 0.5).toFixed(2);
-    }
-    function setFooterDefaults(){
-      it.footer.scale = 1.0;
-      it.footer.posX = 0.5;
-      it.footer.posY = 0.5;
-      syncControlsFromItem();
+    // --- Sticker editor state
+    let selectedStickerId = null;
+    let stickerSeq = 0;
+
+    const $stickerList = stCol.querySelector('#stickerList');
+    const $addSticker = stCol.querySelector('#addSticker');
+    const $applyPreset = stCol.querySelector('#applyPreset');
+    const $setPreset = stCol.querySelector('#setPreset');
+
+    function findSticker(sid){
+      return it.stickers.find(s => s.id === sid) || null;
     }
 
-    // eventos tamaño
+    function setSelectedSticker(sid){
+      selectedStickerId = sid;
+      renderStickerList();
+      $applyPreset.disabled = !(globalStickerPreset && selectedStickerId);
+      $setPreset.disabled = !selectedStickerId;
+    }
+
+    function updateStickerFromInputs(st, row){
+      // números
+      const nScale = row.querySelector('[data-num="scale"]');
+      const nX = row.querySelector('[data-num="x"]');
+      const nY = row.querySelector('[data-num="y"]');
+
+      // sliders
+      const rScale = row.querySelector('[data-range="scale"]');
+      const rX = row.querySelector('[data-range="x"]');
+      const rY = row.querySelector('[data-range="y"]');
+
+      st.scale = clamp(parseFloat(nScale.value), 0.3, 2.2);
+      st.posX  = clamp(parseFloat(nX.value), 0, 1);
+      st.posY  = clamp(parseFloat(nY.value), 0, 1);
+
+      // sync sliders
+      rScale.value = st.scale.toFixed(2);
+      rX.value = st.posX.toFixed(2);
+      rY.value = st.posY.toFixed(2);
+
+      drawItem(it);
+      drawA4Preview();
+    }
+
+    function setInputsFromSticker(st, row){
+      const nScale = row.querySelector('[data-num="scale"]');
+      const nX = row.querySelector('[data-num="x"]');
+      const nY = row.querySelector('[data-num="y"]');
+
+      const rScale = row.querySelector('[data-range="scale"]');
+      const rX = row.querySelector('[data-range="x"]');
+      const rY = row.querySelector('[data-range="y"]');
+
+      nScale.value = st.scale.toFixed(2);
+      nX.value = st.posX.toFixed(2);
+      nY.value = st.posY.toFixed(2);
+
+      rScale.value = st.scale.toFixed(2);
+      rX.value = st.posX.toFixed(2);
+      rY.value = st.posY.toFixed(2);
+    }
+
+    function renderStickerList(){
+      $stickerList.innerHTML = "";
+
+      if(it.stickers.length === 0){
+        const empty = document.createElement('div');
+        empty.className = "small-note";
+        empty.textContent = "Sin stickers. Tocá “Agregar sticker”.";
+        $stickerList.appendChild(empty);
+        return;
+      }
+
+      for(const st of it.stickers){
+        const row = document.createElement('div');
+        row.className = "border rounded-3 p-2";
+        row.style.background = (st.id === selectedStickerId) ? "rgba(10,76,139,.06)" : "transparent";
+
+        row.innerHTML = `
+          <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <div class="d-flex gap-2 align-items-center">
+              <button class="btn btn-sm btn-outline-primary" type="button" data-action="select">
+                Sticker #${st.id}
+              </button>
+              <span class="small-note">Lugar:</span>
+              <select class="form-select form-select-sm" style="max-width:160px" data-field="place">
+                <option value="footer">Pie</option>
+                <option value="overphoto">Sobre foto</option>
+              </select>
+            </div>
+
+            <div class="d-flex gap-2 align-items-center">
+              <select class="form-select form-select-sm" style="max-width:240px" data-field="type">
+                ${buildStickerOptionsHTML()}
+              </select>
+
+              <input class="form-control form-control-sm" type="file" accept="image/png"
+                style="max-width:220px; display:none" data-field="upload" />
+
+              <button class="btn btn-sm btn-outline-danger" type="button" data-action="remove">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-2" data-edit="panel" style="display:none">
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-md-4">
+                <label class="small-note d-block mb-1">Escala</label>
+                <input class="form-range" type="range" min="0.3" max="2.2" step="0.01" data-range="scale">
+                <input class="form-control form-control-sm" type="number" step="0.01" min="0.3" max="2.2" data-num="scale">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="small-note d-block mb-1">Posición X (0..1)</label>
+                <input class="form-range" type="range" min="0" max="1" step="0.01" data-range="x">
+                <input class="form-control form-control-sm" type="number" step="0.01" min="0" max="1" data-num="x">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="small-note d-block mb-1">Posición Y (0..1)</label>
+                <input class="form-range" type="range" min="0" max="1" step="0.01" data-range="y">
+                <input class="form-control form-control-sm" type="number" step="0.01" min="0" max="1" data-num="y">
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <button class="btn btn-sm btn-outline-secondary" type="button" data-action="reset">
+                Reset (center)
+              </button>
+              <span class="small-note">Tip: también podés arrastrar el sticker en el canvas.</span>
+            </div>
+          </div>
+        `;
+
+        const btnSelect = row.querySelector('[data-action="select"]');
+        const btnRemove = row.querySelector('[data-action="remove"]');
+        const btnReset  = row.querySelector('[data-action="reset"]');
+
+        const selType = row.querySelector('[data-field="type"]');
+        const selPlace = row.querySelector('[data-field="place"]');
+        const inpUpload = row.querySelector('[data-field="upload"]');
+
+        const panel = row.querySelector('[data-edit="panel"]');
+
+        // mostrar panel solo si seleccionado
+        if(st.id === selectedStickerId) panel.style.display = "block";
+
+        // set valores actuales
+        selPlace.value = st.place || "footer";
+        selType.value = st.mode === "upload" ? "upload" : (st.key || "none");
+
+        inpUpload.style.display = (selType.value === "upload") ? "block" : "none";
+
+        // si no hay sticker real, ocultar panel
+        const hasSticker = (st.mode !== "none");
+        panel.style.display = (st.id === selectedStickerId && hasSticker) ? "block" : "none";
+
+        // sync inputs
+        setInputsFromSticker(st, row);
+
+        // eventos
+        btnSelect.addEventListener('click', ()=>{
+          setSelectedSticker(st.id);
+        });
+
+        btnRemove.addEventListener('click', ()=>{
+          // liberar url si es upload
+          if(st.mode === "upload" && st.url){
+            try{ URL.revokeObjectURL(st.url); }catch(_){}
+          }
+          it.stickers = it.stickers.filter(x => x.id !== st.id);
+          if(selectedStickerId === st.id) selectedStickerId = null;
+          renderStickerList();
+          drawItem(it); drawA4Preview();
+        });
+
+        btnReset.addEventListener('click', ()=>{
+          st.scale = 1.0; st.posX = 0.5; st.posY = 0.5;
+          setInputsFromSticker(st, row);
+          drawItem(it); drawA4Preview();
+        });
+
+        selPlace.addEventListener('change', ()=>{
+          st.place = selPlace.value;
+          drawItem(it); drawA4Preview();
+        });
+
+        selType.addEventListener('change', async ()=>{
+          const opt = selType.value;
+
+          inpUpload.value = "";
+          inpUpload.style.display = (opt === "upload") ? "block" : "none";
+
+          if(opt === "none"){
+            st.mode = "none";
+            st.key = null;
+            st.img = null;
+            if(st.url){ try{ URL.revokeObjectURL(st.url); }catch(_){} }
+            st.url = null;
+          }else if(opt === "upload"){
+            st.mode = "upload";
+            st.key = null;
+            st.img = null;
+            if(st.url){ try{ URL.revokeObjectURL(st.url); }catch(_){} }
+            st.url = null;
+          }else{
+            await ensureBuiltinStickers();
+            st.mode = "builtin";
+            st.key = opt;
+          }
+
+          // aplicar preset global si existe
+          if(globalStickerPreset){
+            st.place = globalStickerPreset.place;
+            st.scale = globalStickerPreset.scale;
+            st.posX  = globalStickerPreset.posX;
+            st.posY  = globalStickerPreset.posY;
+            selPlace.value = st.place;
+            setInputsFromSticker(st, row);
+          }
+
+          // mostrar/ocultar panel según si hay sticker real
+          const hasSticker = (st.mode !== "none");
+          panel.style.display = (st.id === selectedStickerId && hasSticker) ? "block" : "none";
+
+          drawItem(it); drawA4Preview();
+        });
+
+        inpUpload.addEventListener('change', async ()=>{
+          const f = inpUpload.files?.[0];
+          if(!f) return;
+          if(f.type !== "image/png"){
+            alert("Subí un PNG.");
+            inpUpload.value = "";
+            return;
+          }
+          if(st.url){ try{ URL.revokeObjectURL(st.url); }catch(_){} }
+
+          const {img:upImg, url:upUrl} = await loadImageFromFile(f);
+          st.mode = "upload";
+          st.key = null;
+          st.img = upImg;
+          st.url = upUrl;
+
+          drawItem(it); drawA4Preview();
+        });
+
+        // sliders + números
+        const rScale = row.querySelector('[data-range="scale"]');
+        const rX = row.querySelector('[data-range="x"]');
+        const rY = row.querySelector('[data-range="y"]');
+
+        const nScale = row.querySelector('[data-num="scale"]');
+        const nX = row.querySelector('[data-num="x"]');
+        const nY = row.querySelector('[data-num="y"]');
+
+        rScale.addEventListener('input', ()=>{
+          st.scale = parseFloat(rScale.value);
+          nScale.value = st.scale.toFixed(2);
+          drawItem(it); drawA4Preview();
+        });
+        rX.addEventListener('input', ()=>{
+          st.posX = parseFloat(rX.value);
+          nX.value = st.posX.toFixed(2);
+          drawItem(it); drawA4Preview();
+        });
+        rY.addEventListener('input', ()=>{
+          st.posY = parseFloat(rY.value);
+          nY.value = st.posY.toFixed(2);
+          drawItem(it); drawA4Preview();
+        });
+
+        nScale.addEventListener('change', ()=> updateStickerFromInputs(st, row));
+        nX.addEventListener('change', ()=> updateStickerFromInputs(st, row));
+        nY.addEventListener('change', ()=> updateStickerFromInputs(st, row));
+
+        // si seleccionado pero en "none", panel oculto
+        if(st.id === selectedStickerId && st.mode === "none"){
+          panel.style.display = "none";
+        }
+
+        $stickerList.appendChild(row);
+      }
+    }
+
+    // Agregar sticker
+    $addSticker.addEventListener('click', async ()=>{
+      await ensureBuiltinStickers();
+
+      const stId = ++stickerSeq;
+      const st = {
+        id: stId,
+        mode: "builtin",
+        key: "spotify",
+        img: null,
+        url: null,
+        place: "footer",
+        scale: 1.0,
+        posX: 0.5,
+        posY: 0.5,
+        _bbox: null
+      };
+
+      // si hay preset guardado, aplicarlo al nuevo
+      if(globalStickerPreset){
+        st.place = globalStickerPreset.place;
+        st.scale = globalStickerPreset.scale;
+        st.posX  = globalStickerPreset.posX;
+        st.posY  = globalStickerPreset.posY;
+      }
+
+      it.stickers.push(st);
+      setSelectedSticker(st.id);
+      renderStickerList();
+      drawItem(it); drawA4Preview();
+    });
+
+    // Guardar preset desde seleccionado
+    $setPreset.addEventListener('click', ()=>{
+      if(!selectedStickerId) return;
+      const st = findSticker(selectedStickerId);
+      if(!st || st.mode === "none") return;
+      globalStickerPreset = { place: st.place, scale: st.scale, posX: st.posX, posY: st.posY };
+      $applyPreset.disabled = false;
+      alert("Preset guardado. Ahora podés aplicar a otros stickers.");
+    });
+
+    // Aplicar preset a todos los stickers (de esta foto)
+    $applyPreset.addEventListener('click', ()=>{
+      if(!globalStickerPreset) return;
+      for(const st of it.stickers){
+        if(st.mode === "none") continue;
+        st.place = globalStickerPreset.place;
+        st.scale = globalStickerPreset.scale;
+        st.posX  = globalStickerPreset.posX;
+        st.posY  = globalStickerPreset.posY;
+      }
+      renderStickerList();
+      drawItem(it); drawA4Preview();
+    });
+
+    // Eventos de tamaño / texto / zoom
     sizeSel.addEventListener('change', ()=>{
       it.sizeKey = sizeSel.value;
 
       const d = getDims(it.sizeKey);
       const newBase = coverScale(img.naturalWidth, img.naturalHeight, d.photoW, d.photoH);
-
       it.scale = clamp(it.scale, 0.5, 3);
       if(it.scale < newBase) it.scale = newBase;
 
       it.offX = 0;
       it.offY = 0;
-
       zoomRange.value = it.scale.toFixed(2);
 
       drawItem(it);
@@ -964,85 +1324,12 @@
       drawA4Preview();
     });
 
-    // texto
     capInput.addEventListener('input', ()=>{
       it.caption = capInput.value;
       drawItem(it);
       drawA4Preview();
     });
 
-    // stickers
-    footerSel.addEventListener('change', async ()=>{
-      const opt = footerSel.value;
-
-      footerUpload.value = "";
-      footerUpload.style.display = (opt === "upload") ? "block" : "none";
-
-      if(opt === "none"){
-        it.footer = { mode:"none", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
-      }else if(opt === "upload"){
-        it.footer = { mode:"upload", key:null, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
-      }else{
-        await ensureBuiltinStickers();
-        const cfg = STICKERS[opt];
-        it.footer = { mode:"builtin", key:cfg.key, img:null, url:null, scale:1.0, posX:0.5, posY:0.5, _bbox:null };
-      }
-
-      syncControlsFromItem();
-      drawItem(it);
-      drawA4Preview();
-    });
-
-    footerUpload.addEventListener('change', async ()=>{
-      const f = footerUpload.files?.[0];
-      if(!f) return;
-      if(f.type !== "image/png"){
-        alert("Subí un PNG.");
-        footerUpload.value = "";
-        return;
-      }
-
-      if(it.footer?.url){
-        try{ URL.revokeObjectURL(it.footer.url); }catch(_){}
-      }
-
-      const { img:upImg, url:upUrl } = await loadImageFromFile(f);
-
-      const scale = it.footer?.scale ?? 1.0;
-      const posX  = it.footer?.posX ?? 0.5;
-      const posY  = it.footer?.posY ?? 0.5;
-
-      it.footer = { mode:"upload", key:null, img:upImg, url:upUrl, scale, posX, posY, _bbox:null };
-
-      syncControlsFromItem();
-      drawItem(it);
-      drawA4Preview();
-    });
-
-    // sliders sticker
-    stScale.addEventListener('input', ()=>{
-      applyFooterControlsToItem();
-      drawItem(it);
-      drawA4Preview();
-    });
-    stX.addEventListener('input', ()=>{
-      applyFooterControlsToItem();
-      drawItem(it);
-      drawA4Preview();
-    });
-    stY.addEventListener('input', ()=>{
-      applyFooterControlsToItem();
-      drawItem(it);
-      drawA4Preview();
-    });
-
-    resetStickerBtn.addEventListener('click', ()=>{
-      setFooterDefaults();
-      drawItem(it);
-      drawA4Preview();
-    });
-
-    // zoom
     zoomRange.addEventListener('input', ()=>{
       it.scale = parseFloat(zoomRange.value);
       drawItem(it);
@@ -1058,12 +1345,11 @@
       drawA4Preview();
     });
 
-    // eliminar
     delBtn.addEventListener('click', ()=> removeItem(it.id));
 
-    // Drag para mover encuadre + drag sticker
+    // Drag: si clickeás un sticker => mueve sticker. Si no => mueve foto.
     let dragging = false;
-    let draggingSticker = false;
+    let draggingSticker = null; // sticker id
     let lastX = 0, lastY = 0;
 
     canvas.addEventListener('mousedown', (e)=>{
@@ -1074,25 +1360,30 @@
       const mx = (e.clientX - rect.left) * rx;
       const my = (e.clientY - rect.top) * ry;
 
-      const bb = it.footer?._bbox;
-      if(bb && mx >= bb.x && mx <= bb.x + bb.w && my >= bb.y && my <= bb.y + bb.h){
-        draggingSticker = true;
-        dragging = false;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        e.preventDefault();
-        return;
+      // buscar sticker top-most (de atrás hacia adelante)
+      for(let i=it.stickers.length-1;i>=0;i--){
+        const st = it.stickers[i];
+        const bb = st._bbox;
+        if(!bb) continue;
+        if(mx >= bb.x && mx <= bb.x+bb.w && my >= bb.y && my <= bb.y+bb.h){
+          draggingSticker = st.id;
+          setSelectedSticker(st.id);
+          dragging = false;
+          lastX = e.clientX; lastY = e.clientY;
+          e.preventDefault();
+          return;
+        }
       }
 
+      // si no, mover foto
+      draggingSticker = null;
       dragging = true;
-      draggingSticker = false;
-      lastX = e.clientX;
-      lastY = e.clientY;
+      lastX = e.clientX; lastY = e.clientY;
     });
 
     window.addEventListener('mouseup', ()=>{
       dragging = false;
-      draggingSticker = false;
+      draggingSticker = null;
     });
 
     window.addEventListener('mousemove', (e)=>{
@@ -1105,28 +1396,24 @@
       const dx = (e.clientX - lastX) * rx;
       const dy = (e.clientY - lastY) * ry;
 
-      lastX = e.clientX;
-      lastY = e.clientY;
+      lastX = e.clientX; lastY = e.clientY;
 
       if(draggingSticker){
-        const bb = it.footer?._bbox;
-        if(!bb) return;
+        const st = findSticker(draggingSticker);
+        if(!st || !st._bbox) return;
 
+        const bb = st._bbox;
         const centerX = (bb.x + bb.w/2 + dx - bb.areaX) / bb.areaW;
         const centerY = (bb.y + bb.h/2 + dy - bb.areaY) / bb.areaH;
 
-        it.footer.posX = clamp(centerX, 0, 1);
-        it.footer.posY = clamp(centerY, 0, 1);
+        st.posX = clamp(centerX, 0, 1);
+        st.posY = clamp(centerY, 0, 1);
 
-        stX.value = it.footer.posX.toFixed(2);
-        stY.value = it.footer.posY.toFixed(2);
-
-        drawItem(it);
-        drawA4Preview();
+        renderStickerList(); // para reflejar números si querés
+        drawItem(it); drawA4Preview();
         return;
       }
 
-      // dragging foto
       it.offX += dx;
       it.offY += dy;
 
@@ -1143,12 +1430,12 @@
       drawA4Preview();
     }, { passive:false });
 
-    // inicial
+    // Inicial
     drawItem(it);
+    renderStickerList();
 
     items.push(it);
     enableButtons();
-
     currentPage = 0;
     drawA4Preview();
   }
@@ -1158,7 +1445,12 @@
     if(idx < 0) return;
 
     try{ URL.revokeObjectURL(items[idx].url); }catch(_){}
-    try{ if(items[idx].footer?.url) URL.revokeObjectURL(items[idx].footer.url); }catch(_){}
+    // liberar uploads stickers
+    for(const st of (items[idx].stickers || [])){
+      if(st.mode === "upload" && st.url){
+        try{ URL.revokeObjectURL(st.url); }catch(_){}
+      }
+    }
 
     items.splice(idx, 1);
 
@@ -1194,7 +1486,11 @@
       while(items.length){
         const it = items.pop();
         try{ URL.revokeObjectURL(it.url); }catch(_){}
-        try{ if(it.footer?.url) URL.revokeObjectURL(it.footer.url); }catch(_){}
+        for(const st of (it.stickers || [])){
+          if(st.mode === "upload" && st.url){
+            try{ URL.revokeObjectURL(st.url); }catch(_){}
+          }
+        }
       }
       $cards.innerHTML = '';
       enableButtons();
@@ -1203,9 +1499,7 @@
     });
   }
 
-  // =======================
   // Refresh manual
-  // =======================
   if($refreshPreview){
     $refreshPreview.addEventListener('click', ()=>{
       for(const it of items) drawItem(it);
@@ -1240,13 +1534,13 @@
   }
 
   function drawA4Preview(){
-    const A4_W = 210, A4_H = 297;
+    if(!$a4) return;
 
+    const A4_W = 210, A4_H = 297;
     const cw = $a4.width;
     const ch = $a4.height;
 
     a4ctx.clearRect(0,0,cw,ch);
-
     a4ctx.fillStyle = "#ffffff";
     a4ctx.fillRect(0,0,cw,ch);
 
@@ -1320,18 +1614,10 @@
         }
       }
     }
-
-    a4ctx.fillStyle = "#475569";
-    a4ctx.font = "14px Arial";
-    a4ctx.fillText(
-      `Items en vista: ${list.length} | Mostrando: ${pageItems.length} | Total: ${items.length}`,
-      24,
-      ch - 24
-    );
   }
 
   // =======================
-  // PDF Export
+  // PDF Export (tu lógica previa)
   // =======================
   if($exportPdf){
     $exportPdf.addEventListener('click', ()=>{
