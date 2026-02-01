@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Polaroids 5×7 cm → PDF A4</title>
+<style>
+  :root{--ink:#0b1324;--muted:#475569;--line:#e2e8f0;--accent:#2563eb}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:0;color:var(--ink)}
+  header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  .actions{margin-left:auto;display:flex;gap:8px}
+  .btn{border:1px solid var(--accent);background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+  .btn.out{background:#fff;color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .grid{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .card{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+  .polaroid-wrap{width:5cm;height:7cm;margin:auto;border:1px dashed #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#f8fafc}
+  canvas{width:5cm;height:7cm;border-radius:8px;background:#fff}
+
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stack{display:grid;gap:8px}
+  label{font-size:12px;color:var(--muted)}
+  input[type="text"]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+  input[type="color"],input[type="range"],select{width:100%}
+  footer{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Polaroids 5×7 cm → PDF A4</h1>
+    <input id="file" type="file" accept="image/*" multiple />
+    <div class="actions">
+      <button id="clearAll" class="btn out" disabled>Vaciar</button>
+      <button id="makePdf" class="btn" disabled>Generar PDF A4</button>
+    </div>
+  </header>
+
+  <section class="grid" id="grid"></section>
+
+  <footer>
+    <label><input id="cropMarks" type="checkbox" /> Marcas de corte</label>
+    <small style="color:#64748b">Arrastra para mover foto. Rueda para zoom. Usa “Mover sticker” para arrastrar overlays.</small>
+  </footer>
+
+  <!-- jsPDF UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+
+<script>
+(() => {
+  // ----------------- Constantes -----------------
+  const DPI = 300, MM_PER_IN = 25.4, PX_PER_MM = DPI / MM_PER_IN;
+  const POLA_W_MM = 50, POLA_H_MM = 70;       // 5×7 cm
+  const POLA_W = Math.round(PX_PER_MM * POLA_W_MM);
+  const POLA_H = Math.round(PX_PER_MM * POLA_H_MM);
+
+  // Bordes del área de FOTO dentro del polaroid
+  const MARGIN_LR_MM = 5, MARGIN_TOP_MM = 6, MARGIN_BOTTOM_MM = 12;
+  const MLR = mm2px(MARGIN_LR_MM), MT = mm2px(MARGIN_TOP_MM), MB = mm2px(MARGIN_BOTTOM_MM);
+  const PHOTO_W = POLA_W - 2*MLR, PHOTO_H = POLA_H - MT - MB;
+
+  // ----------------- Estado -----------------
+  const items = []; // {id,img,canvas,ctx,scale,offsetX,offsetY,caption,bgColor,innerFrame,outerFrame,overlays,mode,activeOverlayId}
+  let idSeq = 0;
+
+  // ----------------- UI root -----------------
+  const $grid = document.getElementById('grid');
+  const $file = document.getElementById('file');
+  const $makePdf = document.getElementById('makePdf');
+  const $clearAll = document.getElementById('clearAll');
+
+  function enableActions(){
+    const has = items.length>0;
+    $makePdf.disabled = !has;
+    $clearAll.disabled = !has;
+  }
+
+  // ----------------- Util -----------------
+  function mm2px(mm){ return Math.round(mm * PX_PER_MM); }
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function loadImage(src){
+    return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
+  }
+
+  // ----------------- Nuevo item -----------------
+  function addItem(img){
+    const id = ++idSeq;
+
+    const card = document.createElement('div'); card.className='card';
+    const wrap = document.createElement('div'); wrap.className='polaroid-wrap';
+    const canvas = document.createElement('canvas'); canvas.width=POLA_W; canvas.height=POLA_H;
+    const ctx = canvas.getContext('2d');
+
+    // Controles básicos
+    const caption = inputText('Pie (opcional)');
+    const bgColor = inputColor('Fondo polaroid', '#ffffff');
+
+    // Marcos
+    const innerOn   = inputCheckbox('Marco interno', true);
+    const innerCol  = inputColor('Color marco interno', '#000000');
+    const innerWMM  = inputRange('Grosor interno (mm)', 0, 3, 0.6, 0.1);
+
+    const outerOn   = inputCheckbox('Marco externo', true);
+    const outerCol  = inputColor('Color marco externo', '#000000');
+    const outerWMM  = inputRange('Grosor externo (mm)', 0, 3, 0.5, 0.1);
+
+    // Stickers/overlays
+    const modeSel = select('Modo', ['Mover foto','Mover sticker']);
+    const addStickerBtn = button('Agregar sticker/overlay');
+    const stickerFile = document.createElement('input'); stickerFile.type='file'; stickerFile.accept='image/*'; stickerFile.style.display='none';
+    const overlaySel = select('Sticker activo', []);
+    const ovScale = inputRange('Tamaño sticker', 0.1, 3, 1, 0.01);
+    const ovRot   = inputRange('Rotación sticker (°)', -180, 180, 0, 1);
+    const ovDel   = button('Eliminar sticker');
+
+    const zoom = inputRange('Zoom foto', 0.5, 3, 1, 0.01);
+    const recenter = button('Recentrar');
+
+    // Layout de controles
+    const stack = document.createElement('div'); stack.className='stack';
+    const rowTop = document.createElement('div'); rowTop.className='row';
+    rowTop.appendChild(recenter); rowTop.appendChild(addStickerBtn);
+    stack.append(
+      caption.wrap, bgColor.wrap,
+      innerOn.wrap, innerCol.wrap, innerWMM.wrap,
+      outerOn.wrap, outerCol.wrap, outerWMM.wrap,
+      zoom.wrap,
+      modeSel.wrap, overlaySel.wrap, ovScale.wrap, ovRot.wrap, ovDel
+    );
+
+    wrap.appendChild(canvas);
+    card.appendChild(wrap);
+    card.appendChild(stack);
+    $grid.appendChild(card);
+    document.body.appendChild(stickerFile); // oculto
+
+    // Estado por tarjeta
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const sCover = Math.max(PHOTO_W/iw, PHOTO_H/ih);
+
+    const state = {
+      id, img, canvas, ctx,
+      scale: sCover, offsetX:0, offsetY:0,
+      caption: '', bgColor: '#ffffff',
+      innerFrame:{on:true, color:'#000', wmm:0.6},
+      outerFrame:{on:true, color:'#000', wmm:0.5},
+      overlays: [], activeOverlayId:null,
+      mode:'foto'
+    };
+
+    // --- Binding ---
+    caption.input.addEventListener('input', ()=>{ state.caption=caption.input.value; draw(); });
+    bgColor.input.addEventListener('input', ()=>{ state.bgColor=bgColor.input.value; draw(); });
+
+    innerOn.input.addEventListener('change', ()=>{ state.innerFrame.on=innerOn.input.checked; draw(); });
+    innerCol.input.addEventListener('input', ()=>{ state.innerFrame.color=innerCol.input.value; draw(); });
+    innerWMM.input.addEventListener('input', ()=>{ state.innerFrame.wmm=parseFloat(innerWMM.input.value); draw(); });
+
+    outerOn.input.addEventListener('change', ()=>{ state.outerFrame.on=outerOn.input.checked; draw(); });
+    outerCol.input.addEventListener('input', ()=>{ state.outerFrame.color=outerCol.input.value; draw(); });
+    outerWMM.input.addEventListener('input', ()=>{ state.outerFrame.wmm=parseFloat(outerWMM.input.value); draw(); });
+
+    zoom.input.addEventListener('input', ()=>{ state.scale=parseFloat(zoom.input.value); draw(); });
+    recenter.addEventListener('click', ()=>{
+      state.scale = Math.max(PHOTO_W/iw, PHOTO_H/ih);
+      state.offsetX = 0; state.offsetY = 0; zoom.input.value = state.scale.toFixed(2);
+      draw();
+    });
+
+    modeSel.select.addEventListener('change', ()=>{
+      state.mode = modeSel.select.value === 'Mover sticker' ? 'sticker' : 'foto';
+    });
+
+    addStickerBtn.addEventListener('click', ()=> stickerFile.click());
+    stickerFile.addEventListener('change', async (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const url = URL.createObjectURL(f);
+      const i = await loadImage(url);
+      const ovId = crypto.randomUUID();
+      const o = {id:ovId,img:i,x:POLA_W/2,y:POLA_H/2,scale:1,rot:0};
+      state.overlays.push(o); state.activeOverlayId = ovId;
+      refreshOverlayUI(); draw();
+      stickerFile.value='';
+    });
+
+    overlaySel.select.addEventListener('change', ()=>{
+      state.activeOverlayId = overlaySel.select.value || null;
+      syncOverlayCtrls();
+    });
+    ovScale.input.addEventListener('input', ()=>{
+      const o = getActiveOverlay(); if(!o) return;
+      o.scale = parseFloat(ovScale.input.value); draw();
+    });
+    ovRot.input.addEventListener('input', ()=>{
+      const o = getActiveOverlay(); if(!o) return;
+      o.rot = parseFloat(ovRot.input.value); draw();
+    });
+    ovDel.addEventListener('click', ()=>{
+      const id = state.activeOverlayId; if(!id) return;
+      const k = state.overlays.findIndex(x=>x.id===id);
+      if(k>=0) state.overlays.splice(k,1);
+      state.activeOverlayId = state.overlays[0]?.id || null;
+      refreshOverlayUI(); draw();
+    });
+
+    function getActiveOverlay(){ return state.overlays.find(o=>o.id===state.activeOverlayId) || null; }
+    function refreshOverlayUI(){
+      overlaySel.select.innerHTML='';
+      state.overlays.forEach((o,i)=>{
+        const opt=document.createElement('option'); opt.value=o.id; opt.textContent=`Sticker ${i+1}`;
+        if(o.id===state.activeOverlayId) opt.selected=true;
+        overlaySel.select.appendChild(opt);
+      });
+      syncOverlayCtrls();
+    }
+    function syncOverlayCtrls(){
+      const o = getActiveOverlay();
+      const en = !!o;
+      ovScale.input.disabled = ovRot.input.disabled = ovDel.disabled = overlaySel.select.options.length===0;
+      if(o){ ovScale.input.value = o.scale; ovRot.input.value = o.rot; }
+    }
+
+    // --- Interacción canvas ---
+    let dragging=false,lastX=0,lastY=0;
+    canvas.addEventListener('mousedown', e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; });
+    window.addEventListener('mouseup', ()=> dragging=false);
+    window.addEventListener('mousemove', e=>{
+      if(!dragging) return;
+      const rx = POLA_W / canvas.getBoundingClientRect().width;
+      const ry = POLA_H / canvas.getBoundingClientRect().height;
+      const dx = (e.clientX-lastX)*rx, dy=(e.clientY-lastY)*ry;
+      lastX=e.clientX; lastY=e.clientY;
+      if(state.mode==='sticker' && getActiveOverlay()){
+        const o=getActiveOverlay(); o.x+=dx; o.y+=dy;
+      }else{
+        state.offsetX += dx; state.offsetY += dy;
+      }
+      draw();
+    }, {passive:true});
+
+    canvas.addEventListener('wheel', e=>{
+      e.preventDefault();
+      const delta = e.deltaY<0 ? 1.03 : 0.97;
+      if(state.mode==='sticker' && getActiveOverlay()){
+        const o=getActiveOverlay(); o.scale = clamp(o.scale*delta, 0.1, 3);
+        ovScale.input.value = o.scale;
+      }else{
+        state.scale = clamp(state.scale*delta, 0.5, 3);
+        zoom.input.value = state.scale.toFixed(2);
+      }
+      draw();
+    }, {passive:false});
+
+    // --- Render ---
+    function draw(){
+      // Fondo del polaroid
+      ctx.clearRect(0,0,POLA_W,POLA_H);
+      ctx.fillStyle = state.bgColor; ctx.fillRect(0,0,POLA_W,POLA_H);
+
+      // Foto con clip al rectángulo de foto
+      const x=MLR, y=MT, w=PHOTO_W, h=PHOTO_H;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
+
+      const drawW = iw * state.scale, drawH = ih * state.scale;
+      const cx = x + w/2 + state.offsetX, cy = y + h/2 + state.offsetY;
+      ctx.drawImage(img, cx-drawW/2, cy-drawH/2, drawW, drawH);
+      ctx.restore();
+
+      // Marco interno
+      if(state.innerFrame.on){
+        ctx.strokeStyle = state.innerFrame.color;
+        ctx.lineWidth = mm2px(state.innerFrame.wmm);
+        ctx.strokeRect(x, y, w, h);
+      }
+
+      // Stickers/overlays por encima
+      for(const o of state.overlays){
+        const ow = o.img.naturalWidth, oh=o.img.naturalHeight;
+        const base = Math.min(w,h)*0.4;
+        const sw = base*o.scale, sh = sw*(oh/ow);
+        ctx.save();
+        ctx.translate(o.x, o.y);
+        ctx.rotate(o.rot*Math.PI/180);
+        ctx.drawImage(o.img, -sw/2, -sh/2, sw, sh);
+        ctx.restore();
+      }
+
+      // Pie de foto
+      if (state.caption.trim()){
+        ctx.fillStyle = '#111827';
+        const fontPx = Math.round(3.5 * PX_PER_MM);
+        ctx.font = `500 ${fontPx}px Arial, sans-serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(state.caption.trim(), POLA_W/2, POLA_H - MB/2);
+      }
+
+      // Marco externo solo para vista previa (el PDF también lo dibuja, vectorial)
+      if(state.outerFrame.on){
+        ctx.strokeStyle = state.outerFrame.color;
+        ctx.lineWidth = mm2px(state.outerFrame.wmm);
+        ctx.strokeRect(
+          ctx.lineWidth/2, ctx.lineWidth/2,
+          POLA_W-ctx.lineWidth, POLA_H-ctx.lineWidth
+        );
+      }
+    }
+
+    // Init
+    zoom.input.value = state.scale.toFixed(2);
+    draw();
+
+    items.push(state);
+    enableActions();
+  }
+
+  // ----------------- Componentes UI pequeños -----------------
+  function inputText(ph){ const w=wrap(); const i=document.createElement('input'); i.type='text'; i.placeholder=ph; w.append(i); return {wrap:w,input:i}; }
+  function inputColor(labelTxt, def){ const w=wrap(labelTxt); const i=document.createElement('input'); i.type='color'; i.value=def; w.append(i); return {wrap:w,input:i}; }
+  function inputCheckbox(labelTxt, def){ const w=wrap(); const l=document.createElement('label'); const i=document.createElement('input'); i.type='checkbox'; i.checked=def; l.append(i, ' '+labelTxt); w.append(l); return {wrap:w,input:i}; }
+  function inputRange(labelTxt,min,max,val,step){ const w=wrap(labelTxt); const i=document.createElement('input'); i.type='range'; i.min=min; i.max=max; i.step=step; i.value=val; w.append(i); return {wrap:w,input:i}; }
+  function select(labelTxt, opts){ const w=wrap(labelTxt); const s=document.createElement('select'); opts.forEach(o=>{ const op=document.createElement('option'); op.value=o; op.textContent=o; s.append(op); }); w.append(s); return {wrap:w,select:s}; }
+  function button(txt){ const b=document.createElement('button'); b.textContent=txt; b.className='btn out'; return b; }
+  function wrap(labelTxt){ const d=document.createElement('div'); d.className='controls'; if(labelTxt){ const l=document.createElement('label'); l.textContent=labelTxt; const g=document.createElement('div'); d.append(l,g); return {append:(el)=>g.append(el), get wrap(){return d}}.wrap; } return d; }
+
+  // ----------------- Carga de imágenes -----------------
+  $file.addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files||[]);
+    for(const f of files){
+      if(!f.type.startsWith('image/')) continue;
+      const url = URL.createObjectURL(f);
+      const img = await loadImage(url);
+      addItem(img);
+    }
+    $file.value='';
+  });
+
+  // ----------------- Vaciar -----------------
+  document.getElementById('clearAll').addEventListener('click', ()=>{
+    items.splice(0, items.length);
+    $grid.innerHTML=''; enableActions();
+  });
+
+  // ----------------- PDF -----------------
+  document.getElementById('makePdf').addEventListener('click', ()=>{
+    if(!items.length) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4', compress:true });
+
+    const A4_W = 210, A4_H = 297;
+    const W = POLA_W_MM, H = POLA_H_MM;
+
+    // Gaps mínimos
+    const GAP_X = 3, GAP_Y = 3;
+
+    const COLS = Math.max(1, Math.floor((A4_W + GAP_X) / (W + GAP_X)));
+    const ROWS = Math.max(1, Math.floor((A4_H + GAP_Y) / (H + GAP_Y)));
+
+    const usedW = COLS*W + (COLS-1)*GAP_X;
+    const usedH = ROWS*H + (ROWS-1)*GAP_Y;
+    const startX = (A4_W - usedW)/2;
+    const startY = (A4_H - usedH)/2;
+
+    const perPage = COLS*ROWS;
+    const pages = Math.ceil(items.length / perPage);
+
+    let idx = 0;
+    for (let p=0; p<pages; p++){
+      if (p>0) doc.addPage('a4','portrait');
+      if (document.getElementById('cropMarks').checked)
+        drawCropMarks(doc, startX, startY, W, H, GAP_X, GAP_Y, COLS, ROWS);
+
+      for (let r=0; r<ROWS; r++){
+        for (let c=0; c<COLS; c++){
+          if (idx >= items.length) break;
+          const s = items[idx++];
+
+          const dataUrl = s.canvas.toDataURL('image/png', 1.0);
+          const x = startX + c*(W + GAP_X);
+          const y = startY + r*(H + GAP_Y);
+
+          doc.addImage(dataUrl, 'PNG', x, y, W, H);
+
+          // Marco externo vectorial en PDF con color y grosor por tarjeta
+          if (s.outerFrame.on){
+            doc.setDrawColor(hexToRGB(s.outerFrame.color));
+            doc.setLineWidth(s.outerFrame.wmm);
+            doc.rect(x, y, W, H);
+          }
+        }
+      }
+    }
+    doc.save('polaroids_5x7_A4.pdf');
+  });
+
+  function drawCropMarks(doc, startX, startY, W, H, gapX, gapY, cols, rows){
+    const len = 3; doc.setDrawColor(180); doc.setLineWidth(0.2);
+    for (let r=0;r<rows;r++){
+      for (let c=0;c<cols;c++){
+        const x=startX+c*(W+gapX), y=startY+r*(H+gapY);
+        doc.line(x,y,x+len,y); doc.line(x,y,x,y+len);
+        doc.line(x+W-len,y,x+W,y); doc.line(x+W,y,x+W,y+len);
+        doc.line(x,y+H,x+len,y+H); doc.line(x,y+H-len,x,y+H);
+        doc.line(x+W-len,y+H,x+W,y+H); doc.line(x+W,y+H-len,x+W,y+H);
+      }
+    }
+  }
+
+  function hexToRGB(hex){
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if(!m) return 0;
+    return [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)];
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kuami</title>
+  <meta name="description" content="Ramos tejidos, girasoles y detalles personalizados. Pedidos por WhatsApp e Instagram.">
+  <meta property="og:title" content="Tienda de Detalles">
+  <meta property="og:description" content="Ramos tejidos, girasoles y detalles personalizados.">
+  <meta property="og:image" content="assets/img01.jpg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{ --pri:#0a4c8b; --sec:#ef476f; --ink:#0f6bbc; --soft:#f5f9fc; --ok:#20c997 }
+    html{scroll-padding-top:84px}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;color:var(--ink);background:#fff}
+    .navbar{backdrop-filter:saturate(180%) blur(10px)}
+    .navbar.scrolled{box-shadow:0 6px 24px rgba(0,0,0,.08);background:#ffffffd6}
+    .btn-pri{background:var(--pri);border-color:var(--pri)}
+    .btn-pri:hover{background:#1060aa;border-color:#0a6fce}
+    .btn-ghost{border:1px solid var(--pri);color:var(--pri);background:transparent}
+    .btn-ghost:hover{background:var(--pri);color:#fff}
+    /* Hero */
+    .hero{
+      position:relative;min-height:82vh;display:grid;place-items:center;
+      background-image:linear-gradient(0deg, rgba(10,76,139,.20), rgba(10,76,139,.20)),url('assets/img01.jpg');
+      background-repeat:no-repeat;background-size:cover;background-position:center 35%;background-attachment:scroll;
+    }
+    @media (min-width: 992px){ .hero{background-position:center center;background-attachment:fixed} }
+    .hero .card{backdrop-filter: blur(6px);background:#175502d9;color:#fff}
+    .hero .card h1,.hero .card p,.hero .card .small,.hero .card .text-muted{color:#fff!important}
+    section{padding:72px 0}
+    .section-title{font-weight:800}
+    .product-card{transition:transform .25s ease, box-shadow .25s ease;border:0}
+    .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
+    .product-card img{aspect-ratio:1/1;object-fit:cover;border-top-left-radius:.75rem;border-top-right-radius:.75rem}
+    .filter-pill{cursor:pointer}
+    .price{font-weight:800;color:var(--sec)}
+    .promo{border:0;background:linear-gradient(180deg,#fff, var(--soft))}
+    .badge-save{background:var(--ok)}
+    .count{font-variant-numeric:tabular-nums}
+    .ig-img{aspect-ratio:1/1;object-fit:cover;border-radius:1rem;transition:transform .2s}
+    .ig-img:hover{transform:scale(1.02)}
+    .contact-card{border:0;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    footer{background:#0b1020;color:#aab}
+    footer a{color:#dde}
+    .wa-fab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#25D366;color:#fff;box-shadow:0 10px 20px rgba(0,0,0,.2);z-index:1080}
+    .wa-fab:hover{opacity:.9}
+    /* Botón Instagram */
+    .btn-ig{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border:1px solid #dfe3ea;border-radius:.65rem;background:#fff;color:#1f2a37;text-decoration:none;font-weight:600;transition:box-shadow .2s, transform .2s, background-color .2s}
+    .btn-ig:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-1px)}
+    .btn-ig:active{transform:translateY(0)}
+    .btn-ig .ig-icon{width:20px;height:20px;flex:none;border-radius:.4rem;transition:transform .2s, filter .2s;box-shadow:0 6px 14px rgba(0,0,0,.18)}
+    .btn-ig:hover .ig-icon{transform:scale(1.05);filter:saturate(1.1)}
+    @media (prefers-reduced-motion: reduce){.btn-ig,.btn-ig .ig-icon{transition:none}}
+    /* Carrito badge */
+    .cart-link{position:relative}
+    .cart-count{position:absolute;top:-6px;right:-10px;background:#dc3545;color:#fff;border-radius:999px;font-size:.7rem;line-height:1;padding:.20rem .38rem;min-width:20px;text-align:center}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar navbar-expand-lg fixed-top py-3">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+      <img src="assets/logo.png" alt="Logo" height="40" class="me-2">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#promos">Promos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#instagram">Instagram</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+
+        <!-- NUEVO -->
+        <li class="nav-item"><a class="nav-link" href="herramientas.html">Herramientas</a></li>
+
+        <li class="nav-item ms-lg-2">
+          <a class="btn btn-sm btn-pri" href="https://wa.me/595984024413?text=Hola%20quiero%20hacer%20un%20pedido" target="_blank" rel="noopener">
+            <i class="bi bi-whatsapp me-1"></i>WhatsApp
+          </a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <a class="btn btn-sm btn-outline-primary cart-link" href="carrito.html">
+            <i class="bi bi-bag"></i> Carrito
+            <span id="cartCount" class="cart-count">0</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero text-center">
+  <div class="container">
+    <div class="card border-0 shadow rounded-4 p-4 p-md-5 mx-auto" style="max-width:860px">
+      <h1 class="display-5 fw-bold mb-2">Ramos tejidos, girasoles y detalles que cuentan historias</h1>
+      <p class="lead mb-4">Personalizamos con fotos y temáticas. Entregas rápidas en Asunción y alrededores.</p>
+      <div class="d-flex gap-2 justify-content-center">
+        <a href="#productos" class="btn btn-pri btn-lg"><i class="bi bi-bag-heart me-1"></i> Ver productos</a>
+        <a class="btn-ig" href="https://instagram.com/kuamipy" target="_blank" rel="noopener">
+          <svg class="ig-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <defs><linearGradient id="igG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F58529"/><stop offset="30%" stop-color="#FEDA77"/>
+              <stop offset="60%" stop-color="#DD2A7B"/><stop offset="100%" stop-color="#8134AF"/>
+            </linearGradient></defs>
+            <rect x="0" y="0" width="24" height="24" rx="6" fill="url(#igG)"/>
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="#fff" stroke-width="2"/>
+            <circle cx="12" cy="12" r="4.8" fill="none" stroke="#fff" stroke-width="2"/>
+            <circle cx="17.5" cy="6.5" r="1.5" fill="#fff"/>
+          </svg>
+          Instagram
+        </a>
+      </div>
+      <div class="mt-3 small text-muted">Atención: Lun–Sáb 09:00–18:00</div>
+    </div>
+  </div>
+</header>
+
+<!-- PRODUCTOS -->
+<section id="productos">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div>
+        <h2 class="section-title mb-1">Productos destacados</h2>
+        <p class="text-secondary mb-0">Seleccioná una categoría o mirá todo.</p>
+      </div>
+      <div class="btn-group" role="group" aria-label="Filtros">
+        <button class="btn btn-outline-primary filter-pill active" data-filter="all">Todos</button>
+        <button class="btn btn-outline-primary filter-pill" data-filter="ramos">Ramos</button>
+        <button class="btn btn-outline-primary filter-pill" data-filter="tejidos">Fotos</button>
+        <button class="btn btn-outline-primary filter-pill" data-filter="personalizados">Personalizados</button>
+      </div>
+    </div>
+
+    <div class="row g-4" id="gridProductos">
+      <!-- 1 -->
+      <div class="col-6 col-md-4 col-lg-3 product" data-cat="tejidos personalizados">
+        <div class="card product-card rounded-4">
+          <img src="assets/img01.jpg" alt="Tulipanes temáticos" loading="lazy" class="w-100">
+          <div class="card-body">
+            <h6 class="mb-1">Tulipanes temáticos</h6>
+            <div class="small text-secondary">Amigurumi</div>
+            <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
+              <span class="price">Gs. 95.000</span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-primary btn-add"
+                        data-id="p01" data-name="Tulipanes temáticos" data-price="95000" data-img="assets/img01.jpg">
+                  Agregar
+                </button>
+                <button class="btn btn-sm btn-pri"
+                        data-bs-toggle="modal" data-bs-target="#modalImg"
+                        data-img="assets/img01.jpg" data-title="Tulipanes temáticos">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 2 -->
+      <div class="col-6 col-md-4 col-lg-3 product" data-cat="ramos personalizados">
+        <div class="card product-card rounded-4">
+          <img src="assets/img02.jpg" alt="Girasol con relicario" loading="lazy" class="w-100">
+          <div class="card-body">
+            <h6 class="mb-1">Girasol con relicario</h6>
+            <div class="small text-secondary">Foto personalizada</div>
+            <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
+              <span class="price">Gs. 120.000</span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-primary btn-add"
+                        data-id="p02" data-name="Girasol con relicario" data-price="120000" data-img="assets/img02.jpg">
+                  Agregar
+                </button>
+                <button class="btn btn-sm btn-pri"
+                        data-bs-toggle="modal" data-bs-target="#modalImg"
+                        data-img="assets/img02.jpg" data-title="Girasol con relicario">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3..12 autogenerados -->
+      <script>
+        const extra = [
+          {t:'Mini bouquet',cat:'ramos',p:'75.000'},
+          {t:'Ramo clásico',cat:'ramos',p:'110.000'},
+          {t:'Set foto y corazón',cat:'tejidos',p:'85.000'},
+          {t:'Ramo premium',cat:'ramos personalizados',p:'190.000'},
+          {t:'Fotos con Colgantes',cat:'tejidos',p:'45.000'},
+          {t:'Caja Corazones',cat:'personalizados',p:'150.000'},
+          {t:'Cuadros',cat:'personalizados',p:'130.000'},
+          {t:'Cajitas sorpresas',cat:'personalizados',p:'140.000'},
+          {t:'Calendarios',cat:'tejidos',p:'80.000'},
+          {t:'Cajas y flores',cat:'tejidos',p:'95.000'}
+        ];
+        document.addEventListener('DOMContentLoaded', () => {
+          const grid = document.getElementById('gridProductos');
+          extra.forEach((e,i)=>{
+            const n = String(i+3).padStart(2,'0');
+            const priceNum = parseInt(e.p.replace(/\D/g,''),10) || 0;
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3 product';
+            col.dataset.cat = e.cat;
+            col.innerHTML = `
+              <div class="card product-card rounded-4">
+                <img src="assets/img${n}.jpg" alt="${e.t}" loading="lazy" class="w-100">
+                <div class="card-body">
+                  <h6 class="mb-1">${e.t}</h6>
+                  <div class="small text-secondary text-truncate">${e.cat}</div>
+                  <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
+                    <span class="price">Gs. ${e.p}</span>
+                    <div class="d-flex gap-1">
+                      <button class="btn btn-sm btn-outline-primary btn-add"
+                              data-id="p${n}" data-name="${e.t}" data-price="${priceNum}" data-img="assets/img${n}.jpg">
+                        Agregar
+                      </button>
+                      <button class="btn btn-sm btn-pri"
+                              data-bs-toggle="modal" data-bs-target="#modalImg"
+                              data-img="assets/img${n}.jpg" data-title="${e.t}">Ver</button>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            grid.appendChild(col);
+          });
+        });
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- PROMOS -->
+<section id="promos" class="bg-light">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div><h2 class="section-title mb-1">Promociones</h2><p class="text-secondary mb-0">Stock limitado. Pedidos por WhatsApp.</p></div>
+      <div class="small text-muted">Termina en <span id="countdown" class="count fw-bold"></span></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img03.jpg" class="rounded-top-4 w-100" alt="Promo 1" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge badge-save">Ahorra 15%</span>
+            <h5 class="mt-2 mb-1">Duo Tulipanes</h5>
+            <p class="text-secondary mb-3">Incluye tarjeta dedicatoria.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="text-decoration-line-through text-muted me-2">Gs. 110.000</span><span class="price">Gs. 93.500</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%20Duo%20Tulipanes">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img04.jpg" class="rounded-top-4 w-100" alt="Promo 2" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge bg-warning text-dark">2x1</span>
+            <h5 class="mt-2 mb-1">Mini bouquets</h5>
+            <p class="text-secondary mb-3">El segundo al 50%.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="price">Gs. 75.000</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%20Mini%20bouquets">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img05.jpg" class="rounded-top-4 w-100" alt="Promo 3" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge bg-info text-dark">Nuevo</span>
+            <h5 class="mt-2 mb-1">Girasol + relicario</h5>
+            <p class="text-secondary mb-3">Personaliza con foto.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="price">Gs. 120.000</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20Girasol%20con%20relicario">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMBOS -->
+<section id="combos" class="bg-light">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div><h2 class="section-title mb-1">Combos</h2><p class="text-secondary mb-0">HAZ TU PEDIDO!.</p></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img13.jpg" class="rounded-top-4 w-100" alt="25 Fotos Polaroid 5x7" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge badge-save">A partir de 2 ahorra 5%</span>
+            <h5 class="mt-2 mb-1">25 Fotos Polaroid</h5>
+            <p class="text-secondary mb-3">Tamaño 5×7 cm.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="text-decoration-line-through text-muted me-2">Gs. 35.000</span><span class="price">Gs. 30.000</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%2025%20Polaroid%205x7">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img15.jpg" class="rounded-top-4 w-100" alt="25 Fotos Polaroid 7x9" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge badge-save">Delivery gratis con 3 pedidos</span>
+            <h5 class="mt-2 mb-1">25 Fotos Polaroid</h5>
+            <p class="text-secondary mb-3">Tamaño 7×9 cm.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="price">Gs. 50.000</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%2025%20Polaroid%207x9">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card promo rounded-4 h-100">
+          <img src="assets/img14.jpg" class="rounded-top-4 w-100" alt="Foto Póster 30 cm" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+          <div class="card-body">
+            <span class="badge bg-info text-dark">Nuevo</span>
+            <h5 class="mt-2 mb-1">Foto Póster</h5>
+            <p class="text-secondary mb-3">Tamaño 30 cm.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div><span class="price">Gs. 80.000</span></div>
+              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20Foto%20Póster%2030%20cm">Pedir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section id="instagram">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div><h2 class="section-title mb-1">Instagram</h2><p class="text-secondary mb-0">@tu_usuario</p></div>
+      <a class="btn btn-ghost" href="https://www.instagram.com/tu_usuario" target="_blank" rel="noopener"><i class="bi bi-instagram me-1"></i>Ver perfil</a>
+    </div>
+    <div class="row g-3">
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img06.jpg" alt="Post 1" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img07.jpg" alt="Post 2" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img08.jpg" alt="Post 3" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img09.jpg" alt="Post 4" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img10.jpg" alt="Post 5" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img11.jpg" alt="Post 6" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img12.jpg" alt="Post 7" loading="lazy"></div>
+      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img02.jpg"  alt="Post 8" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto" class="bg-light">
+  <div class="container">
+    <h2 class="section-title mb-4">Contacto</h2>
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card contact-card rounded-4 p-4">
+          <form class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" required>
+                <div class="invalid-feedback">Escribe tu nombre.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" class="form-control" required>
+                <div class="invalid-feedback">Ingresa un número válido.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Mensaje</label>
+                <textarea class="form-control" rows="4" required></textarea>
+                <div class="invalid-feedback">Cuéntanos qué necesitas.</div>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button type="submit" class="btn btn-pri"><i class="bi bi-send me-1"></i>Enviar</button>
+              <a class="btn btn-success" target="_blank" rel="noopener" href="https://wa.me/595984024413?text=Hola%2C%20quiero%20un%20presupuesto"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>
+              <a class="btn btn-ghost" target="_blank" rel="noopener" href="mailto:tucorreo@dominio.com?subject=Consulta%20desde%20la%20web">Email</a>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="rounded-4 p-4 h-100" style="background:linear-gradient(180deg,#fff,var(--soft))">
+          <h5 class="fw-bold">Horarios</h5>
+          <ul class="list-unstyled mb-4">
+            <li>Lun–Vie: 09:00–18:00</li>
+            <li>Sábados: 09:00–13:00</li>
+          </ul>
+          <h5 class="fw-bold">Ubicación</h5>
+          <p>Asunción, Paraguay</p>
+          <iframe title="Mapa" class="w-100 rounded-4" height="220" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Asunci%C3%B3n%2C%20Paraguay&output=embed"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="pt-5 pb-4">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-6">
+        <h5 class="mb-1">Tienda de Detalles</h5>
+        <div class="small">Hecho con cariño. Pagos por transferencia y efectivo.</div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a class="me-3" href="https://www.instagram.com/tu_usuario" target="_blank" rel="noopener"><i class="bi bi-instagram"></i> Instagram</a>
+        <a class="me-3" href="https://wa.me/595984024413" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+        <span class="small d-block d-md-inline mt-2 mt-md-0">© <span id="yy"></span></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL IMG -->
+<div class="modal fade" id="modalImg" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"></h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <img src="" alt="" class="w-100 rounded-4" style="aspect-ratio:16/10;object-fit:cover">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="addToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMsg">Agregado al carrito</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB WhatsApp -->
+<a class="wa-fab" href="https://wa.me/595984024413?text=Hola%2C%20vengo%20de%20la%20web" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <i class="bi bi-whatsapp fs-3"></i>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ===== Utilidades carrito ===== */
+  const CART_KEY = 'carritoKuami';
+  const getCart = () => JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+  const setCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
+  const formatGs = n => 'Gs. ' + (n||0).toLocaleString('es-PY');
+
+  const updateBadge = () => {
+    const n = getCart().reduce((a,i)=>a + (i.qty||0), 0);
+    const b = document.getElementById('cartCount');
+    if(b){ b.textContent = n }
+  };
+
+  const showToast = (msg='Agregado al carrito') => {
+    const el = document.getElementById('addToast');
+    document.getElementById('toastMsg').textContent = msg;
+    const t = new bootstrap.Toast(el, { delay: 1500 });
+    t.show();
+  };
+
+  const addToCart = (item) => {
+    const cart = getCart();
+    const found = cart.find(p => p.id === item.id);
+    if(found){ found.qty += 1 }
+    else { cart.push({...item, qty: 1}) }
+    setCart(cart);
+    updateBadge();
+    showToast(`${item.name} agregado`);
+  };
+
+  /* ===== Navbar shrink ===== */
+  const nav = document.querySelector('.navbar');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+  document.addEventListener('scroll', onScroll); onScroll();
+
+  /* ===== Filtros ===== */
+  document.querySelectorAll('.filter-pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.filter;
+      document.querySelectorAll('#gridProductos .product').forEach(card=>{
+        const has = card.dataset.cat.toLowerCase().includes(cat);
+        card.classList.toggle('d-none', cat!=='all' && !has);
+      });
+    });
+  });
+
+  /* ===== Modal imagen ===== */
+  const modal = document.getElementById('modalImg');
+  modal.addEventListener('show.bs.modal', e=>{
+    const b = e.relatedTarget;
+    modal.querySelector('.modal-title').textContent = b.getAttribute('data-title') || 'Producto';
+    modal.querySelector('img').src = b.getAttribute('data-img');
+    modal.querySelector('img').alt = b.getAttribute('data-title') || 'Producto';
+  });
+
+  /* ===== Validación formulario ===== */
+  (()=> {
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', ev=>{
+      if(!form.checkValidity()){ev.preventDefault();ev.stopPropagation();}
+      form.classList.add('was-validated');
+    }, false);
+  })();
+
+  /* ===== Countdown 7 días ===== */
+  const end = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+7, 23,59,59);
+  const out = document.getElementById('countdown');
+  setInterval(()=>{
+    const s = Math.max(0, Math.floor((end - new Date())/1000));
+    const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), ss = s%60;
+    out.textContent = `${String(d).padStart(2,'0')}d:${String(h).padStart(2,'0')}h:${String(m).padStart(2,'0')}m:${String(ss).padStart(2,'0')}s`;
+  },1000);
+
+  /* ===== Año footer ===== */
+  document.getElementById('yy').textContent = new Date().getFullYear();
+
+  /* ===== Delegación: Agregar al carrito ===== */
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.btn-add');
+    if(!btn) return;
+    const price = parseInt(btn.dataset.price,10) || 0;
+    addToCart({
+      id: btn.dataset.id,
+      name: btn.dataset.name,
+      price,
+      img: btn.dataset.img
+    });
+  });
+
+  /* ===== Inicializar badge al cargar ===== */
+  document.addEventListener('DOMContentLoaded', updateBadge);
+</script>
+</body>
+</html>

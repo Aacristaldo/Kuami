@@ -1,0 +1,383 @@
+<!--
+  Página web de merchandising de estilo japonés con animación adicional
+  Fondo fijo + flashes por encima en el hero.
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pulse</title>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Sawarabi+Mincho&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --color-bg:#0b0b0b; --color-primary:#e6343c; --color-secondary:#f4c542;
+      --color-accent:#3abfa3; --color-light:#fdfdfd; --color-dark:#1a1a1a;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Noto Sans JP',sans-serif;background:var(--color-bg);color:var(--color-light);overflow-x:hidden}
+    section{scroll-margin-top:72px}
+
+    /* Header */
+    header{
+      position:fixed;top:0;left:0;width:100%;
+      background:linear-gradient(90deg,var(--color-primary),var(--color-secondary));
+      display:flex;justify-content:space-between;align-items:center;
+      padding:.6rem 1rem;z-index:1000;box-shadow:0 2px 6px rgba(0,0,0,.4)
+    }
+    header h1{font-family:'Sawarabi Mincho',serif;font-size:1.5rem;letter-spacing:1px}
+    nav ul{list-style:none;display:flex;gap:1rem}
+    nav a{color:var(--color-light);text-decoration:none;font-weight:700}
+    nav a:hover{color:var(--color-dark)}
+
+    /* Hero: fondo base fijo + canvas por encima + contenido arriba */
+    .hero{
+      position:relative;height:100vh;overflow:hidden;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    }
+    .hero::before{
+      content:"";position:absolute;inset:0;z-index:0;
+      background:url('assets/foto14.jpg') center/cover no-repeat; /* FOTO BASE */
+      filter:brightness(.45);
+    }
+    .hero-canvas{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;}
+    .hero-content{position:relative;z-index:2;}
+    .hero h2{font-family:'Sawarabi Mincho',serif;font-size:3rem;margin-bottom:1rem;letter-spacing:2px}
+    .hero p{max-width:640px;font-size:1.1rem;line-height:1.6}
+    .scroll-down{margin-top:2rem;font-size:2rem;color:var(--color-secondary);animation:bounce 2s infinite}
+    @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+
+    /* Intro */
+    section.intro{
+      padding:5rem 2rem;background:var(--color-dark);display:flex;flex-wrap:wrap;align-items:center;gap:2rem;position:relative
+    }
+    section.intro::before{
+      content:"";position:absolute;inset:0;z-index:-1;
+      background-image:url('assets/foto5.png');background-size:cover;background-position:center;opacity:.0
+    }
+    .intro-content{flex:1 1 40%}
+    .intro-content h3{font-family:'Sawarabi Mincho',serif;font-size:2rem;margin-bottom:1rem;color:var(--color-secondary)}
+    .intro-content p{margin-bottom:1rem;line-height:1.6}
+    .intro-image{flex:1 1 50%;display:flex;justify-content:center}
+    .intro-image img{width:100%;max-width:520px;border-radius:15px;box-shadow:0 4px 12px rgba(0,0,0,.5);transition:transform .5s}
+    .intro-image img:hover{transform:scale(1.05)}
+
+    /* Productos */
+    section.productos{padding:5rem 2rem;background:var(--color-bg);position:relative}
+    section.productos::before{
+      content:"";position:absolute;inset:0;z-index:-1;
+      background-image:url('assets/foto1.png');background-size:cover;background-position:center;opacity:.12
+    }
+    .productos h3{font-family:'Sawarabi Mincho',serif;color:var(--color-secondary);font-size:2.5rem;text-align:center;margin-bottom:2rem}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem}
+    .product-card{background:var(--color-dark);border-radius:15px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,.4);display:flex;flex-direction:column;transition:.3s}
+    .product-card:hover{transform:translateY(-5px);box-shadow:0 8px 12px rgba(0,0,0,.5)}
+    .product-image{height:200px;background-size:cover;background-position:center}
+    .product-info{padding:1rem;display:flex;flex-direction:column;gap:.5rem;flex:1}
+    .product-info h4{color:var(--color-secondary)}
+    .price{font-weight:800;color:var(--color-primary)}
+    .buy-button{
+      align-self:flex-start;padding:.5rem 1rem;border:none;border-radius:6px;cursor:pointer;
+      background:linear-gradient(45deg,var(--color-primary),var(--color-secondary));color:var(--color-dark);font-weight:700;text-transform:uppercase
+    }
+    .buy-button:hover{opacity:.85}
+
+    /* Contacto */
+    section.contacto{padding:5rem 2rem;background:var(--color-dark);position:relative;overflow:hidden}
+    section.contacto::before{
+      content:"";position:absolute;top:0;right:0;width:50%;height:100%;z-index:0;
+      background-image:url('assets/foto13.jpg');background-size:cover;background-position:center;opacity:.15;mix-blend-mode:screen
+    }
+    .contact-wrapper{position:relative;z-index:1;max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2rem}
+    .contact-info{flex:1 1 40%}
+    .contact-info h3{font-family:'Sawarabi Mincho',serif;font-size:2rem;color:var(--color-secondary);margin-bottom:1rem}
+    .contact-form{flex:1 1 55%;display:flex;flex-direction:column;gap:1rem}
+    .contact-form input,.contact-form textarea{
+      width:100%;padding:.75rem 1rem;border:2px solid var(--color-primary);border-radius:6px;background:var(--color-bg);color:var(--color-light)
+    }
+    .contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:var(--color-secondary)}
+    .contact-form button{
+      align-self:flex-start;padding:.75rem 1.5rem;border:none;border-radius:6px;cursor:pointer;
+      background:linear-gradient(45deg,var(--color-primary),var(--color-accent));color:var(--color-dark);font-weight:800;text-transform:uppercase
+    }
+    .contact-form button:hover{opacity:.85}
+
+    footer{padding:1rem;text-align:center;background:var(--color-dark);font-size:.9rem}
+
+    @media (max-width:768px){
+      .hero h2{font-size:2.2rem}
+      .intro-content,.intro-image,.contact-info,.contact-form{flex:1 1 100%}
+      header h1{font-size:1.2rem}
+      nav ul{gap:.6rem}
+    }
+  </style>
+</head>
+<body>
+  <!-- Navegación principal -->
+  <header>
+    <h1>PULSE</h1>
+    <nav>
+      <ul>
+        <li><a href="#presentacion">Inicio</a></li>
+        <li><a href="#introduccion">Estilo</a></li>
+        <li><a href="#catalogo">Productos</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Presentación -->
+  <section id="presentacion" class="hero">
+    <canvas id="flashCanvas" class="hero-canvas"></canvas>
+    <div class="hero-content">
+      <h2>Bienvenido al Harajuku Streetwear</h2>
+      <p>Sumérgete en una fusión única de tradición y modernidad. Descubre prendas, accesorios y arte que reflejan la diversidad estética de Japón: desde el Harajuku vibrante hasta la elegancia de un ukiyo-e reinventado.</p>
+      <div class="scroll-down">▼</div>
+    </div>
+  </section>
+
+  <!-- Introducción -->
+  <section id="introduccion" class="intro">
+    <div class="intro-content">
+      <h3>La inspiración que nos mueve</h3>
+      <p>La cultura visual de Japón es un caleidoscopio de contrastes. En sus calles conviven los colores chispeantes del anime con la serenidad atemporal de un jardín zen.</p>
+      <p>El streetwear y Harajuku se mezclan con el ukiyo-e y siluetas inspiradas en el kimono. Cada pieza es una invitación a expresarte con libertad.</p>
+    </div>
+    <div class="intro-image">
+      <img src="assets/foto1.png" alt="Chica Harajuku en calle japonesa">
+    </div>
+  </section>
+
+  <!-- Productos -->
+  <section id="catalogo" class="productos py-5">
+    <div class="container">
+      <h3 class="text-center mb-4">Productos Destacados</h3>
+
+      <div class="row g-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card bg-dark text-light h-100 shadow">
+            <img src="assets/foto2.png" class="card-img-top" alt="Camiseta Harajuku">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Blusa Harajuku</h5>
+              <p class="card-text">Estampado inspirado en máquinas expendedoras de Tokyo con toques neón retro.</p>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-danger">$29.99</span>
+                <button class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal" data-bs-target="#productModal"
+                  data-title="Camiseta Harajuku" data-price="$29.99"
+                  data-desc="Algodón suave, corte unisex, estampado neón estilo Tokyo."
+                  data-img="assets/foto2.png">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card bg-dark text-light h-100 shadow">
+            <img src="assets/foto5.png" class="card-img-top" alt="Sudadera Kawaii">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Sudadera Kawaii</h5>
+              <p class="card-text">Ilustraciones pastel y fit oversize para máximo confort y estilo.</p>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-danger">$39.99</span>
+                <button class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal" data-bs-target="#productModal"
+                  data-title="Sudadera Kawaii" data-price="$39.99"
+                  data-desc="Felpa premium, capucha forrada y arte kawaii exclusivo."
+                  data-img="assets/foto5.png">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card bg-dark text-light h-100 shadow">
+            <img src="assets/foto4.png" class="card-img-top" alt="Gorra Oni Street">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Peluca Oni Street</h5>
+              <p class="card-text">Ilustración de oni en rojo y negro para completar tu outfit urbano.</p>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-danger">$24.99</span>
+                <button class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal" data-bs-target="#productModal"
+                  data-title="Gorra Oni Street" data-price="$24.99"
+                  data-desc="Visera curva, ajuste trasero y bordado oni de alto detalle."
+                  data-img="assets/foto4.png">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card bg-dark text-light h-100 shadow">
+            <img src="assets/foto3.jpg" class="card-img-top" alt="Poster Ukiyo Moderno">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">Poster Ukiyo Moderno</h5>
+              <p class="card-text">Caligrafía tradicional fusionada con arte digital para tus paredes.</p>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-danger">$14.99</span>
+                <button class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal" data-bs-target="#productModal"
+                  data-title="Poster Ukiyo Moderno" data-price="$14.99"
+                  data-desc="Impreso en papel artístico 250 g, acabado mate."
+                  data-img="assets/foto3.jpg">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" class="contacto">
+    <div class="contact-wrapper">
+      <div class="contact-info">
+        <h3>Contacto</h3>
+        <p>¿Tienes dudas o sugerencias? Escríbenos o completa el formulario.</p>
+        <p><strong>Email:</strong> contacto@tiendajaponesa.com</p>
+        <p><strong>Teléfono:</strong> +595 123 456 789</p>
+        <p><strong>Dirección:</strong> Calle Ficticia 123, Asunción, Paraguay</p>
+      </div>
+      <form class="contact-form">
+        <input type="text" placeholder="Nombre" required>
+        <input type="email" placeholder="Correo electrónico" required>
+        <textarea rows="5" placeholder="Tu mensaje" required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>© 2025 Tienda Nihon. Todos los derechos reservados.</footer>
+
+  <!-- Modal Producto -->
+  <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="modalTitle">Título</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="row g-3 align-items-start">
+            <div class="col-12 col-md-6">
+              <img id="modalImg" src="" alt="" class="img-fluid rounded">
+            </div>
+            <div class="col-12 col-md-6">
+              <p id="modalDesc" class="mb-3"></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span id="modalPrice" class="fw-bold fs-5 text-warning"></span>
+                <button class="btn btn-success">Añadir al carrito</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS + scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  // Modal de productos
+  document.getElementById('productModal').addEventListener('show.bs.modal', function (event) {
+    const btn   = event.relatedTarget;
+    const title = btn.getAttribute('data-title');
+    const desc  = btn.getAttribute('data-desc');
+    const price = btn.getAttribute('data-price');
+    const img   = btn.getAttribute('data-img');
+    this.querySelector('#modalTitle').textContent = title;
+    this.querySelector('#modalDesc').textContent  = desc;
+    this.querySelector('#modalPrice').textContent = price;
+    this.querySelector('#modalImg').src           = img;
+    this.querySelector('#modalImg').alt           = title;
+  });
+
+  // Flashes sobre fondo fijo del hero
+  window.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('flashCanvas');
+    const ctx    = canvas.getContext('2d');
+    let W=0, H=0, DPR=1;
+
+    function fit(){
+      const r = canvas.getBoundingClientRect();
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height;
+      canvas.width  = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR,0,0,DPR,0,0); // dibujar en unidades CSS px
+    }
+    addEventListener('resize', fit, {passive:true}); fit();
+
+    // Usa tus 3 fotos para flashes
+    const sources = [
+    'assets/foto15.jpg',
+    'assets/foto19.jpg',
+    'assets/foto18.jpg',
+    'assets/foto20.jpg',
+    'assets/foto21.jpg',
+    'assets/foto22.jpg',
+    'assets/foto23.jpg',
+    'assets/foto24.jpg',
+    'assets/foto25.jpg',
+    'assets/foto26.jpg',
+    'assets/foto27.jpg',
+    'assets/foto28.jpg',
+    'assets/foto29.jpg',
+    'assets/foto30.jpg',
+    'assets/foto31.jpg',
+    'assets/foto32.jpg',
+    'assets/foto33.jpg'
+  ];
+    const imgs = [];
+    let loaded = 0, running = false;
+    sources.forEach(src=>{
+      const im = new Image(); im.src = src;
+      im.onload = ()=>{ loaded++; if(!running && loaded>=1){ running=true; start(); } };
+      imgs.push(im);
+    });
+
+    const flashes = [];
+    function spawn(){
+      const im = imgs[Math.floor(Math.random()*imgs.length)];
+      const maxW = W * (0.18 + Math.random()*0.22);   // 18%–40% ancho
+      const ratio = (im.naturalHeight||im.height) / (im.naturalWidth||im.width);
+      const w = maxW, h = w * ratio;
+      const x = Math.random()*(W - w), y = Math.random()*(H - h);
+      flashes.push({im,x,y,w,h,a:0.9});
+      if(flashes.length>22) flashes.shift();
+    }
+
+    function tick(){
+      // velo para desvanecer trazas
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      ctx.fillRect(0,0,W,H);
+
+      for(let i=flashes.length-1;i>=0;i--){
+        const f = flashes[i];
+        ctx.save(); ctx.globalAlpha = f.a; ctx.filter = 'contrast(110%) saturate(110%)';
+        ctx.drawImage(f.im, f.x, f.y, f.w, f.h);
+        ctx.restore();
+        f.a -= 0.02;
+        if(f.a<=0){ flashes.splice(i,1); }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function start(){
+      setInterval(spawn, 140 + Math.random()*160);
+      requestAnimationFrame(tick);
+    }
+  });
+  </script>
+</body>
+</html>

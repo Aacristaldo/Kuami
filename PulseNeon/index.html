@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NEON PULSOS — Merch por tandas</title>
+  <meta name="description" content="Merch limitado por pulsos: lanzamientos fugaces, diseños neon retro-futuristas. Catálogo y contacto." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1:#0b1020;  /* base */
+      --bg-2:#0a0020;  /* deep */
+      --neo-1:#00f5ff; /* cyan */
+      --neo-2:#ff2cdf; /* magenta */
+      --neo-3:#9dff00; /* acid */
+      --ink:#d7e7ff;   /* text */
+      --muted:#86a1c1; /* secondary text */
+      --card:#0e1530a6;/* glass */
+      --grid:#26114d;  /* retro grid */
+      --radius:18px;
+      --shadow:0 8px 24px rgba(0,0,0,.35), 0 0 40px #000 inset;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); background: radial-gradient(1200px 600px at 20% -10%, #32005a 0%, transparent 50%),
+                radial-gradient(1000px 600px at 80% -20%, #002d49 0%, transparent 55%),
+                linear-gradient(180deg, var(--bg-2), var(--bg-1));
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    a{color:var(--neo-1); text-decoration:none}
+    .container{max-width:1200px; margin:auto; padding:0 20px}
+
+    /* ===== NAV ===== */
+    nav{position:fixed; inset:0 0 auto 0; height:64px; display:flex; align-items:center; z-index:50;
+        background:linear-gradient(180deg, rgba(10,5,30,.85), rgba(10,5,30,.35)); backdrop-filter: blur(10px); border-bottom:1px solid #2a2a55}
+    nav .brand{font-family:Orbitron, Inter; font-weight:700; letter-spacing:.08em; font-size:1.1rem}
+    nav .brand b{color:var(--neo-2)}
+    nav .links{margin-left:auto; display:flex; gap:18px}
+    nav .links a{padding:8px 12px; border-radius:999px; font-weight:600; color:var(--ink); opacity:.9}
+    nav .links a:hover{box-shadow:0 0 0 2px #ffffff22, 0 0 12px var(--neo-1) inset}
+
+    /* ===== HERO ===== */
+    .hero{position:relative; min-height:92vh; display:grid; place-items:center; overflow:hidden}
+    /* background image with neon city + rain reflection (Unsplash) */
+    .hero::before{content:""; position:absolute; inset:0;
+      background:url('https://images.unsplash.com/photo-1732678552208-109e9a2f1b98?q=80&w=1600&auto=format&fit=crop&ixid=MnwyNjg0Mjd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwY2l0eSUyMHJhaW58ZW58MHx8fHwxNzI4MzgyNDA4') center/cover no-repeat;
+      filter:contrast(1.05) saturate(1.25) brightness(.75);
+      opacity:.35}
+    /* retro grid floor */
+    .grid-floor{position:absolute; inset:auto 0 0 0; height:45vh; background:
+      linear-gradient(#0000 0 50%, #0008),
+      repeating-linear-gradient(90deg, #0000 0 48px, var(--grid) 49px 50px),
+      repeating-linear-gradient(0deg,  #0000 0 48px, var(--grid) 49px 50px);
+      mask:linear-gradient(0deg, transparent 0, black 40%);
+      transform:perspective(800px) rotateX(65deg);
+      box-shadow:inset 0 0 60px #000}
+    /* rain layer */
+    .rain{position:absolute; inset:0; pointer-events:none; background:transparent}
+
+    .hero-inner{position:relative; z-index:2; text-align:center; padding:120px 0 80px}
+    .kicker{color:var(--muted); font-weight:700; letter-spacing:.25em; text-transform:uppercase}
+    h1{font-family:Orbitron, Inter; font-weight:700; font-size:clamp(40px,6vw,72px); line-height:1.02; margin:14px 0}
+    .fx{background:linear-gradient(90deg, var(--neo-1), var(--neo-2)); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 0 12px #00eaff66)}
+    .lead{max-width:760px; margin:8px auto 26px; color:var(--ink); opacity:.9; font-size:1.1rem}
+    .cta{display:inline-grid; grid-auto-flow:column; gap:14px}
+    .btn{border:1px solid #2a2a55; padding:12px 18px; border-radius:999px; font-weight:800; letter-spacing:.02em}
+    .btn.primary{background:linear-gradient(90deg, #00eaff22, #ff2cdf22); box-shadow:0 0 24px #00eaff33}
+    .btn.primary:hover{box-shadow:0 0 28px #00eaff55, 0 0 18px #ff2cdf44 inset}
+
+    /* ===== SECTIONS ===== */
+    section{padding:84px 0}
+    .card{background:linear-gradient(180deg, #0d1130aa, #0a0f2aaa); border:1px solid #2a2a55; border-radius:var(--radius); box-shadow:var(--shadow)}
+
+    /* Catálogo */
+    .catalogo{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px}
+    .item{position:relative; overflow:hidden}
+    .item img{width:100%; height:220px; object-fit:cover; display:block; filter:contrast(1.05) saturate(1.1)}
+    .item .info{padding:14px}
+    .tag{font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+    .title{font-weight:800; margin:6px 0 8px}
+    .meta{display:flex; gap:10px; align-items:center; font-size:.9rem; color:#cfe2ff}
+    .pill{border:1px solid #2a2a55; border-radius:999px; padding:4px 10px}
+
+    .timer{position:absolute; top:12px; right:12px; font-weight:800; font-family:Orbitron; background:#000b; border:1px solid #2a2a55; border-radius:10px; padding:6px 10px; box-shadow:0 0 14px #00eaff55}
+
+    /* Contacto */
+    form{display:grid; gap:12px}
+    input, textarea{background:#0b1230; border:1px solid #2a2a55; color:var(--ink); padding:12px 14px; border-radius:12px; outline:none}
+    input:focus, textarea:focus{box-shadow:0 0 0 2px #00eaff55}
+
+    /* Footer */
+    footer{padding:40px 0; color:#b4c6ea; border-top:1px solid #2a2a55; background:linear-gradient(180deg, transparent, #090d22)}
+
+    /* Small helpers */
+    .grid-2{display:grid; grid-template-columns:1.2fr .8fr; gap:22px}
+    @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="container">
+    <div class="brand"><b>PULSE</b></div>
+    <div class="links">
+      <a href="#presentacion">Presentación</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="presentacion" aria-label="Sección de presentación">
+    <canvas class="rain" id="rain"></canvas>
+    <div class="grid-floor"></div>
+    <div class="hero-inner container">
+      <div class="kicker">Merch limitado</div>
+      <h1>
+        <span class="fx">Pulse</span>, No lo sentis 
+        <span class="fx"><br> LO VIVIS</span> 
+      </h1>
+      <p class="lead">Lanzamos colecciones en ventanas cortas. Cuando el reloj llega a cero, el pulso termina y no se reponen. Descubrí el drop activo y asegurá tu pieza.</p>
+      <div class="cta">
+        <a class="btn primary" href="#catalogo">Ver catálogo</a>
+        <a class="btn" href="#contacto">Quiero colaborar</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="catalogo">
+      <h2 style="font-family:Orbitron; margin:0 0 18px">Catálogo activo</h2>
+      <p style="color:var(--muted); margin-top:0">Cada item muestra tiempo restante del pulso. Stock y talles se liberan solo durante la ventana.</p>
+      <div class="catalogo">
+        <!-- Item 1 -->
+        <article class="card item" data-deadline="+2d6h">
+          <div class="timer" aria-live="polite">--:--:--</div>
+          <img alt="Hoodie neón en calle con lluvia" src="/Asets/" />
+          <div class="info">
+            <div class="tag">Drop #12 · LIMITADO</div>
+            <div class="title">Hoodie CYBER-RAIN</div>
+            <div class="meta">
+              <span class="pill">S-XXL</span>
+              <span class="pill">Unisex</span>
+              <span class="pill" style="border-color:#00ffaa55">Algodón + print UV</span>
+            </div>
+          </div>
+        </article>
+        <!-- Item 2 -->
+        <article class="card item" data-deadline="+20h">
+          <div class="timer">--:--:--</div>
+          <img alt="Retrato con máscara neón" src="https://images.unsplash.com/photo-1638120812573--SeyfFUbFy4?q=80&w=1200&auto=format&fit=crop&ixid=MnwyNjg0Mjd8MHwxfHNlYXJjaHwxfHxuZW9uJTIwbWFzayUyMGhvb2RpZXxlbnwwfHx8fDE3MjgzODI0MDg" />
+          <div class="info">
+            <div class="tag">Pulso Flash</div>
+            <div class="title">Tee GHOST-NOVA</div>
+            <div class="meta">
+              <span class="pill">XS-XL</span>
+              <span class="pill">100 uds</span>
+              <span class="pill">Tintas fluorescentes</span>
+            </div>
+          </div>
+        </article>
+        <!-- Item 3 -->
+        <article class="card item" data-deadline="+4d">
+          <div class="timer">--:--:--</div>
+          <img alt="Calle con lluvia y neón" src="https://images.unsplash.com/photo-1724700175051-GX3ccHQaxVI?q=80&w=1200&auto=format&fit=crop&ixid=MnwyNjg0Mjd8MHwxfHNlYXJjaHwxfHxqYXBhbiUyMG5lb24lMjByYWlufGVufDB8fHx8MTcyODM4MjQwOA" />
+          <div class="info">
+            <div class="tag">Preventa</div>
+            <div class="title">Cap RAIN-REFLECT</div>
+            <div class="meta">
+              <span class="pill">Única</span>
+              <span class="pill">Reflectivo 3M</span>
+              <span class="pill">Reborde ácido</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contacto" class="grid-2">
+      <div>
+        <h2 style="font-family:Orbitron; margin:0 0 18px">Contacto</h2>
+        <p style="color:var(--muted)">Mayoristas, artistas y marcas: escriban para colaborar en futuros pulsos. Respuesta en 24h.</p>
+        <form onsubmit="event.preventDefault(); alert('Gracias. Te contactamos.'); this.reset();">
+          <input required placeholder="Nombre" />
+          <input type="email" required placeholder="Email" />
+          <textarea rows="6" required placeholder="Mensaje"></textarea>
+          <button class="btn primary" type="submit">Enviar</button>
+        </form>
+      </div>
+      <aside class="card" style="padding:18px">
+        <h3 style="font-family:Orbitron; margin-top:0">Cómo funcionan los pulsos</h3>
+        <ul style="margin:10px 0 0 18px; color:#cfe2ff">
+          <li>Ventanas cortas con contador visible.</li>
+          <li>Producción limitada. Sin reposiciones.</li>
+          <li>Reservas confirmadas al finalizar el pago.</li>
+          <li>Colabs: colecciones cápsula curadas.</li>
+        </ul>
+        <p style="color:var(--muted)">Tip: suscribite a notificaciones del navegador para enterarte del próximo drop.</p>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap">
+      <div>© <span id="y"></span>PULSE</div>
+      <div style="opacity:.8">IG/TikTok: @Pulse/div>
+    </div>
+  </footer>
+
+  <script>
+  // ===== Año footer =====
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // ===== Lluvia canvas =====
+  (function rain(){
+    const c = document.getElementById('rain');
+    const ctx = c.getContext('2d');
+    let w,h; let drops=[]; const N=180;
+    function resize(){ w = c.width  = innerWidth; h = c.height = Math.max(innerHeight*0.92, 520); }
+    function reset(d){ d.x=Math.random()*w; d.y=Math.random()*-h; d.l=10+Math.random()*18; d.vy=6+Math.random()*8; d.opacity=.35+.55*Math.random(); }
+    function init(){ drops = Array.from({length:N}, ()=>({})); drops.forEach(reset); }
+    function frame(){
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle = 'rgba(0,245,255,0.7)';
+      ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+      for(const d of drops){
+        ctx.globalAlpha = d.opacity;
+        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x, d.y + d.l); ctx.stroke();
+        d.y += d.vy; d.x += 0.7; // leve viento
+        if(d.y > h) reset(d);
+      }
+      requestAnimationFrame(frame);
+    }
+    addEventListener('resize', resize); resize(); init(); frame();
+  })();
+
+  // ===== Countdown pulsos =====
+  (function countdown(){
+    const items = document.querySelectorAll('.item');
+    const nowMs = Date.now();
+    for(const el of items){
+      const spec = el.getAttribute('data-deadline');
+      let deadline = Date.now() + 48*3600e3; // default 48h
+      if(spec && spec.startsWith('+')){
+        const m = spec.match(/\+(\d+)([dhm])/i);
+        if(m){ const v = +m[1]; const u = m[2].toLowerCase();
+          deadline = nowMs + (u==='d'? v*864e5 : u==='h'? v*3600e3 : v*60e3);
+        }
+      }
+      el.dataset.deadlineAbs = deadline;
+    }
+    function tick(){
+      const t = Date.now();
+      document.querySelectorAll('.item').forEach(el=>{
+        const timer = el.querySelector('.timer');
+        const d = +el.dataset.deadlineAbs;
+        let ms = d - t; if(ms < 0) ms = 0;
+        const hh = String(Math.floor(ms/3600e3)).padStart(2,'0');
+        const mm = String(Math.floor(ms%3600e3/60e3)).padStart(2,'0');
+        const ss = String(Math.floor(ms%60e3/1e3)).padStart(2,'0');
+        timer.textContent = `${hh}:${mm}:${ss}`;
+        timer.style.boxShadow = ms<3600e3? '0 0 18px #ff2cdfaa' : '0 0 14px #00eaff55';
+      });
+    }
+    setInterval(tick, 1000); tick();
+  })();
+  </script>
+
+  <!-- Créditos de imágenes (Unsplash, uso libre)**
+    - Hero + Item 1 + 3: fotos de lluvia y neón (ver enlaces en código src)
+    - Item 2: retrato con máscara neon (Unsplash)
+  -->
+</body>
+</html>

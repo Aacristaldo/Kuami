@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Herramientas | Kuami</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      /* === Paleta index === */
+      --pri:#055e30;
+      --sec:#ef476f;
+      --ink:#0f6bbc;
+      --soft:#f5f9fc;
+      --ok:#20c997;
+
+      /* Neutros */
+      --line:#e2e8f0;
+      --text:#264383;
+      --muted:#000000;
+
+      /* UI */
+      --card:#ffffff;
+      --shadow: 0 12px 34px rgba(0,0,0,.10);
+    }
+
+    html{scroll-padding-top:84px}
+
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;
+      color:var(--text);
+      /* MÁS COLOR (subimos opacidad) */
+      background:
+        radial-gradient(1200px 650px at 18% -10%, rgba(10,76,139,.18), transparent 55%),
+        radial-gradient(900px 520px at 92% 0%, rgba(239,71,111,.16), transparent 55%),
+        linear-gradient(180deg, #bbddab 0%, var(--soft) 100%);
+      min-height:100vh;
+    }
+
+    /* Navbar */
+    .navbar{backdrop-filter:saturate(180%) blur(10px)}
+    .navbar.scrolled{box-shadow:0 6px 24px rgba(0,0,0,.08);background:#ffffffd6}
+
+    .page-wrap{padding-top:92px;padding-bottom:60px}
+
+    /* Header / Hero */
+    .hero-tools{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(245,249,252,.96));
+      border:1px solid rgba(10,76,139,.18);
+      border-radius:1rem;
+      padding:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    /* Barra de acento para que se note más "Kuami" */
+    .hero-tools .accent-bar{
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--pri), var(--sec));
+      width:160px;
+      margin-bottom:10px;
+    }
+    .hero-tools::before{
+      content:"";
+      position:absolute;
+      bottom:-120px;
+      left:-120px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(10,76,139,.26), rgba(10,76,139,0));
+      pointer-events:none;
+    }
+    .hero-tools::after{
+      content:"";
+      position:absolute;
+      top:-90px;
+      right:-90px;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(239,71,111,.24), rgba(239,71,111,0));
+      pointer-events:none;
+    }
+
+    h1,h2,h3,.h1,.h2,.h3{color:var(--pri)}
+    .small-note{color:var(--muted);font-size:.9rem}
+
+    /* Tabs */
+    .nav-tabs{
+      border-bottom:1px solid rgba(10,76,139,.18);
+    }
+    .nav-tabs .nav-link{
+      color:var(--pri);
+      border:1px solid transparent;
+      border-top-left-radius:12px;
+      border-top-right-radius:12px;
+      padding:.6rem 1rem;
+    }
+    .nav-tabs .nav-link:hover{background:rgba(10,76,139,.06)}
+    .nav-tabs .nav-link.active{
+      color:var(--pri);
+      background:linear-gradient(180deg,#fff,var(--soft));
+      border-color:rgba(10,76,139,.18) rgba(10,76,139,.18) transparent;
+      font-weight:700;
+      box-shadow: 0 -8px 20px rgba(10,76,139,.06);
+    }
+
+    /* Botones */
+    .btn-pri{background:var(--pri);border-color:var(--pri);color:#fff}
+    .btn-pri:hover{background:#1060aa;border-color:#0a6fce;color:#fff}
+
+    /* Chips */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:linear-gradient(180deg,#fff,var(--soft));
+      border:1px solid rgba(10,76,139,.18);
+      border-radius:999px;
+      padding:8px 12px;
+    }
+
+    /* ===== Tool Header (más ordenado) ===== */
+    .tool-head{
+      border:1px solid rgba(10,76,139,.14);
+      border-radius:1rem;
+      padding:14px;
+      background:rgba(75, 98, 73, 0.92);
+      box-shadow:var(--shadow);
+    }
+
+    /* Bloques internos para ordenar */
+    .control-card{
+      height:100%;
+      border:1px solid rgba(10,76,139,.12);
+      border-radius:14px;
+      padding:12px;
+      background:linear-gradient(180deg, #fff, var(--soft));
+    }
+    .control-title{
+      font-weight:800;
+      color:var(--pri);
+      font-size:.95rem;
+      margin-bottom:.45rem;
+      display:flex;
+      align-items:center;
+      gap:.45rem;
+    }
+    .control-title i{opacity:.9}
+
+    /* Barra separadora sutil */
+    .tool-divider{
+      height:1px;
+      background:linear-gradient(90deg, rgba(10,76,139,.10), rgba(239,71,111,.10), rgba(10,76,139,.10));
+      border:0;
+      margin:14px 0;
+    }
+
+    /* Grid de tarjetas */
+    .tool-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:14px;
+    }
+
+    .p-card{
+      border:1px solid rgba(10,76,139,.12);
+      border-radius:1rem;
+      padding:12px;
+      background:rgba(255,255,255,.92);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .p-preview{
+      border:1px dashed rgba(10,76,139,.28);
+      border-radius:12px;
+      background:
+        radial-gradient(600px 220px at 10% 0%, rgba(10,76,139,.08), transparent 60%),
+        linear-gradient(180deg,#fff,var(--soft));
+      padding:10px;
+      display:grid;
+      place-items:center;
+      min-height:260px;
+      user-select:none;
+    }
+    .p-preview canvas{
+      max-width:100%;
+      height:auto;
+      border-radius:10px;
+      background:#fff;
+      cursor:grab;
+    }
+    .p-preview canvas:active{cursor:grabbing}
+
+    /* Preview A4 */
+    .a4wrap{
+      border:1px solid rgba(10,76,139,.14);
+      border-radius:1rem;
+      padding:14px;
+      background:rgba(255,255,255,.92);
+      box-shadow:var(--shadow);
+    }
+    .a4canvas{
+      width:100%;
+      max-width:900px;
+      border:1px solid rgba(10,76,139,.20);
+      border-radius:12px;
+      background:#fff;
+      display:block;
+    }
+
+    /* Responsive: botones full width en mobile */
+    @media (max-width: 991.98px){
+      .btn-resp{width:100%}
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top py-3 bg-white">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="index.html">
+        <img src="assets/logo.png" alt="Logo" height="40" class="me-2"> Kuami
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="index.html#productos">Productos</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#combos">Combos</a></li>
+          <li class="nav-item"><a class="nav-link" href="carrito.html">Carrito</a></li>
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-sm btn-pri" href="https://wa.me/595984024413?text=Hola%20quiero%20hacer%20un%20pedido" target="_blank" rel="noopener">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container page-wrap">
+    <div class="hero-tools mb-4">
+      <div class="accent-bar"></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <h1 class="h3 mb-1">Herramientas Kuami</h1>
+          <div class="small-note">Subí fotos, ajustá el encuadre (arrastrar + zoom), previsualizá y exportá a PDF A4.</div>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-primary" href="index.html"><i class="bi bi-house"></i> Volver</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="toolsTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-herramienta" data-bs-toggle="tab" data-bs-target="#pane-herramienta" type="button" role="tab">
+          Herramienta
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-proximamente" data-bs-toggle="tab" data-bs-target="#pane-prox" type="button" role="tab">
+          Próximamente
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content pt-3">
+      <!-- ===== Pane Herramienta ===== -->
+      <div class="tab-pane fade show active" id="pane-herramienta" role="tabpanel" aria-labelledby="tab-herramienta">
+
+        <div class="tool-head mb-3">
+          <div class="row g-3">
+            <!-- Bloque 1: subir fotos -->
+            <div class="col-lg-5">
+              <div class="control-card">
+                <div class="control-title"><i class="bi bi-images"></i> Agregar fotos</div>
+                <input id="files" type="file" accept="image/*" multiple class="form-control">
+                <div class="small-note mt-2">Podés seleccionar varias imágenes a la vez.</div>
+              </div>
+            </div>
+
+            <!-- Bloque 2: preview + opciones -->
+            <div class="col-lg-4">
+              <div class="control-card">
+                <div class="control-title"><i class="bi bi-aspect-ratio"></i> Previsualización A4</div>
+                <select id="previewSize" class="form-select">
+                  <option value="50x70">A4 con Polaroids 5×7 cm</option>
+                  <option value="70x90">A4 con Polaroids 7×9 cm</option>
+                </select>
+
+                <div class="mt-3">
+                  <div class="control-title"><i class="bi bi-sliders"></i> Opciones PDF</div>
+                  <label class="chip w-100 justify-content-between">
+                    <span class="d-inline-flex align-items-center gap-2">
+                      <i class="bi bi-scissors"></i>
+                      <span class="small">Marcas de corte</span>
+                    </span>
+                    <input id="cropMarks" type="checkbox" class="form-check-input m-0">
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloque 3: acciones -->
+            <div class="col-lg-3">
+              <div class="control-card d-flex flex-column gap-2">
+                <div class="control-title"><i class="bi bi-lightning-charge"></i> Acciones</div>
+                <button id="exportPdf" class="btn btn-pri btn-resp" disabled>
+                  <i class="bi bi-filetype-pdf"></i> Exportar PDF A4
+                </button>
+                <button id="clearAll" class="btn btn-outline-danger btn-resp" disabled>
+                  <i class="bi bi-trash"></i> Vaciar
+                </button>
+                <div class="small-note mt-1">Primero cargá fotos para habilitar exportación.</div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="tool-divider">
+
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="chip"><i class="bi bi-arrows-move"></i> Arrastrar: mover encuadre</span>
+            <span class="chip"><i class="bi bi-mouse"></i> Rueda: zoom</span>
+            <span class="chip"><i class="bi bi-aspect-ratio"></i> Tamaños: 5×7 cm y 7×9 cm</span>
+            <span class="small-note">Cada tarjeta permite elegir su tamaño.</span>
+          </div>
+        </div>
+
+        <!-- Grid de tarjetas -->
+        <div id="cards" class="tool-grid mb-4"></div>
+
+        <!-- Previsualización A4 -->
+        <div class="a4wrap">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <h2 class="h5 m-0">Previsualización hoja A4</h2>
+            <div class="small-note">Vista previa (no a escala real en pantalla). El PDF sale en A4 real.</div>
+          </div>
+          <canvas id="a4preview" class="a4canvas" width="1200" height="1700"></canvas>
+        </div>
+
+      </div>
+
+
+      <!-- ===== Pane Prox ===== -->
+      <div class="tab-pane fade" id="pane-prox" role="tabpanel" aria-labelledby="tab-proximamente">
+        <div class="alert alert-info">
+          
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-4 bg-light">
+    <div class="container text-center small">© <span id="yy"></span> Kuami</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    // =======================
+    // Config / utilidades
+    // =======================
+    const DPI = 300;
+    const MM_PER_IN = 25.4;
+    const PX_PER_MM = DPI / MM_PER_IN;
+
+    const SIZES = {
+      "50x70": { wmm:50, hmm:70, name:"5x7 cm" , photo:{mlr:5, mt:6, mb:12}},
+      "70x90": { wmm:70, hmm:90, name:"7x9 cm" , photo:{mlr:6, mt:7, mb:16}}
+    };
+
+    function mm2px(mm){ return Math.round(mm * PX_PER_MM); }
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+    function loadImageFromFile(file){
+      return new Promise((resolve, reject)=>{
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = ()=> resolve({img, url});
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    // =======================
+    // Estado
+    // =======================
+    const items = []; // {id, sizeKey, img, url, canvas, ctx, scale, offX, offY, caption, zoomEl, sizeEl}
+    let seq = 0;
+
+    // =======================
+    // DOM
+    // =======================
+    const $files = document.getElementById('files');
+    const $cards = document.getElementById('cards');
+    const $clearAll = document.getElementById('clearAll');
+    const $exportPdf = document.getElementById('exportPdf');
+    const $cropMarks = document.getElementById('cropMarks');
+    const $previewSize = document.getElementById('previewSize');
+
+    const $a4 = document.getElementById('a4preview');
+    const a4ctx = $a4.getContext('2d');
+
+    document.getElementById('yy').textContent = new Date().getFullYear();
+
+    function enableButtons(){
+      const has = items.length > 0;
+      $clearAll.disabled = !has;
+      $exportPdf.disabled = !has;
+    }
+
+    // =======================
+    // Render Polaroid
+    // =======================
+    function getDims(sizeKey){
+      const s = SIZES[sizeKey];
+      const W = mm2px(s.wmm);
+      const H = mm2px(s.hmm);
+
+      const MLR = mm2px(s.photo.mlr);
+      const MT  = mm2px(s.photo.mt);
+      const MB  = mm2px(s.photo.mb);
+
+      const photoW = W - 2*MLR;
+      const photoH = H - MT - MB;
+
+      return { W, H, MLR, MT, MB, photoW, photoH };
+    }
+
+    function coverScale(imgW, imgH, photoW, photoH){
+      return Math.max(photoW/imgW, photoH/imgH);
+    }
+
+    function drawItem(it){
+      const { W, H, MLR, MT, MB, photoW, photoH } = getDims(it.sizeKey);
+
+      // asegurar tamaño canvas
+      if(it.canvas.width !== W || it.canvas.height !== H){
+        it.canvas.width = W;
+        it.canvas.height = H;
+      }
+
+      const ctx = it.ctx;
+      ctx.clearRect(0,0,W,H);
+
+      // Fondo blanco
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0,0,W,H);
+
+      // Área foto (clip)
+      const x = MLR, y = MT;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x,y,photoW,photoH);
+      ctx.clip();
+
+      const iw = it.img.naturalWidth;
+      const ih = it.img.naturalHeight;
+
+      const drawW = iw * it.scale;
+      const drawH = ih * it.scale;
+
+      const cx = x + photoW/2 + it.offX;
+      const cy = y + photoH/2 + it.offY;
+
+      ctx.drawImage(it.img, cx - drawW/2, cy - drawH/2, drawW, drawH);
+      ctx.restore();
+
+      // Marco interno (simple)
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = mm2px(0.6);
+      ctx.strokeRect(x, y, photoW, photoH);
+
+      // Pie
+      const cap = (it.caption || "").trim();
+      if(cap){
+        const fontPx = Math.round(3.5 * PX_PER_MM);
+        ctx.fillStyle = "#111827";
+        ctx.font = `600 ${fontPx}px Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(cap, W/2, H - MB/2);
+      }
+
+      // Marco externo
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = mm2px(0.5);
+      ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, W-ctx.lineWidth, H-ctx.lineWidth);
+    }
+
+    // =======================
+    // Crear tarjeta
+    // =======================
+    function createCard({img, url}){
+      const id = ++seq;
+
+      const sizeKey = "50x70";
+      const { photoW, photoH } = getDims(sizeKey);
+      const baseScale = coverScale(img.naturalWidth, img.naturalHeight, photoW, photoH);
+
+      const it = {
+        id,
+        sizeKey,
+        img,
+        url,
+        scale: baseScale,
+        offX: 0,
+        offY: 0,
+        caption: ""
+      };
+
+      // UI
+      const card = document.createElement('div');
+      card.className = 'p-card';
+      card.dataset.id = String(id);
+
+      const topRow = document.createElement('div');
+      topRow.className = 'd-flex justify-content-between align-items-center gap-2';
+
+      const title = document.createElement('div');
+      title.innerHTML = `<div class="fw-semibold">Foto #${id}</div><div class="small-note">Elegí tamaño y ajustá encuadre.</div>`;
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-outline-danger btn-sm';
+      delBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+      delBtn.title = "Eliminar esta foto";
+
+      topRow.append(title, delBtn);
+
+      const preview = document.createElement('div');
+      preview.className = 'p-preview';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = mm2px(SIZES[sizeKey].wmm);
+      canvas.height = mm2px(SIZES[sizeKey].hmm);
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      preview.appendChild(canvas);
+
+      const controls = document.createElement('div');
+      controls.className = 'row g-2';
+
+      // Tamaño
+      const sizeCol = document.createElement('div');
+      sizeCol.className = 'col-12 col-md-6';
+      sizeCol.innerHTML = `
+        <label class="form-label fw-semibold">Tamaño Polaroid</label>
+        <select class="form-select form-select-sm">
+          <option value="50x70">5×7 cm</option>
+          <option value="70x90">7×9 cm</option>
+        </select>
+      `;
+      const sizeSel = sizeCol.querySelector('select');
+
+      // Caption
+      const capCol = document.createElement('div');
+      capCol.className = 'col-12 col-md-6';
+      capCol.innerHTML = `
+        <label class="form-label fw-semibold">Pie (opcional)</label>
+        <input type="text" class="form-control form-control-sm" placeholder="Ej: Cumple de Ana">
+      `;
+      const capInput = capCol.querySelector('input');
+
+      // Zoom
+      const zoomCol = document.createElement('div');
+      zoomCol.className = 'col-12';
+      zoomCol.innerHTML = `
+        <label class="form-label fw-semibold">Zoom</label>
+        <input type="range" class="form-range" min="0.5" max="3" step="0.01" value="${baseScale.toFixed(2)}">
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm" type="button"><i class="bi bi-crosshair"></i> Recentrar</button>
+          <div class="small-note align-self-center">Arrastrá la foto en la vista previa.</div>
+        </div>
+      `;
+      const zoomRange = zoomCol.querySelector('input[type="range"]');
+      const recBtn = zoomCol.querySelector('button');
+
+      controls.append(sizeCol, capCol, zoomCol);
+
+      card.append(topRow, preview, controls);
+      $cards.appendChild(card);
+
+      // Guardar refs
+      it.canvas = canvas;
+      it.ctx = ctx;
+      it.zoomEl = zoomRange;
+      it.sizeEl = sizeSel;
+
+      // Eventos UI
+      sizeSel.addEventListener('change', ()=>{
+        it.sizeKey = sizeSel.value;
+
+        // recalcular escala base (cover)
+        const d = getDims(it.sizeKey);
+        const newBase = coverScale(img.naturalWidth, img.naturalHeight, d.photoW, d.photoH);
+
+        // si el zoom estaba “cerca” del base anterior, lo ponemos al nuevo base
+        // si no, mantenemos (pero limitado)
+        it.scale = clamp(it.scale, 0.5, 3);
+        if(it.scale < newBase) it.scale = newBase;
+
+        it.offX = 0;
+        it.offY = 0;
+
+        zoomRange.value = it.scale.toFixed(2);
+        drawItem(it);
+        drawA4Preview();
+      });
+
+      capInput.addEventListener('input', ()=>{
+        it.caption = capInput.value;
+        drawItem(it);
+        drawA4Preview();
+      });
+
+      zoomRange.addEventListener('input', ()=>{
+        it.scale = parseFloat(zoomRange.value);
+        drawItem(it);
+        drawA4Preview();
+      });
+
+      recBtn.addEventListener('click', ()=>{
+        const d = getDims(it.sizeKey);
+        it.scale = coverScale(img.naturalWidth, img.naturalHeight, d.photoW, d.photoH);
+        it.offX = 0; it.offY = 0;
+        zoomRange.value = it.scale.toFixed(2);
+        drawItem(it);
+        drawA4Preview();
+      });
+
+      delBtn.addEventListener('click', ()=>{
+        removeItem(it.id);
+      });
+
+      // Drag en canvas (mover foto)
+      let dragging = false;
+      let lastX = 0, lastY = 0;
+
+      canvas.addEventListener('mousedown', (e)=>{
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+      });
+
+      window.addEventListener('mouseup', ()=> dragging = false);
+
+      window.addEventListener('mousemove', (e)=>{
+        if(!dragging) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const rx = canvas.width / rect.width;
+        const ry = canvas.height / rect.height;
+
+        const dx = (e.clientX - lastX) * rx;
+        const dy = (e.clientY - lastY) * ry;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        it.offX += dx;
+        it.offY += dy;
+
+        drawItem(it);
+        drawA4Preview();
+      }, { passive:true });
+
+      canvas.addEventListener('wheel', (e)=>{
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 1.04 : 0.96;
+        it.scale = clamp(it.scale * delta, 0.5, 3);
+        zoomRange.value = it.scale.toFixed(2);
+        drawItem(it);
+        drawA4Preview();
+      }, { passive:false });
+
+      // Inicial render
+      drawItem(it);
+
+      // Add state
+      items.push(it);
+      enableButtons();
+      drawA4Preview();
+    }
+
+    function removeItem(id){
+      const idx = items.findIndex(x => x.id === id);
+      if(idx < 0) return;
+
+      // liberar objectURL
+      try{ URL.revokeObjectURL(items[idx].url); }catch(_){}
+
+      items.splice(idx, 1);
+
+      // borrar card
+      const card = $cards.querySelector(`[data-id="${id}"]`);
+      if(card) card.remove();
+
+      enableButtons();
+      drawA4Preview();
+    }
+
+    // =======================
+    // Carga de imágenes
+    // =======================
+    $files.addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files || []);
+      for(const f of files){
+        if(!f.type.startsWith('image/')) continue;
+        const loaded = await loadImageFromFile(f);
+        createCard(loaded);
+      }
+      $files.value = '';
+    });
+
+    // =======================
+    // Vaciar
+    // =======================
+    $clearAll.addEventListener('click', ()=>{
+      if(!confirm('¿Vaciar todas las fotos cargadas?')) return;
+      while(items.length){
+        const it = items.pop();
+        try{ URL.revokeObjectURL(it.url); }catch(_){}
+      }
+      $cards.innerHTML = '';
+      enableButtons();
+      drawA4Preview();
+    });
+
+    // =======================
+    // Previsualización A4
+    // =======================
+    $previewSize.addEventListener('change', drawA4Preview);
+
+    function drawA4Preview(){
+      // A4 mm
+      const A4_W = 210, A4_H = 297;
+
+      // canvas preview (px)
+      const cw = $a4.width;
+      const ch = $a4.height;
+
+      // limpiar
+      a4ctx.clearRect(0,0,cw,ch);
+
+      // fondo hoja
+      a4ctx.fillStyle = "#ffffff";
+      a4ctx.fillRect(0,0,cw,ch);
+
+      // borde hoja
+      a4ctx.strokeStyle = "#e2e8f0";
+      a4ctx.lineWidth = 2;
+      a4ctx.strokeRect(10,10,cw-20,ch-20);
+
+      const sizeKey = $previewSize.value;
+      const s = SIZES[sizeKey];
+      const W = s.wmm, H = s.hmm;
+
+      const GAP_X = 3, GAP_Y = 3;
+
+      const COLS = Math.max(1, Math.floor((A4_W + GAP_X) / (W + GAP_X)));
+      const ROWS = Math.max(1, Math.floor((A4_H + GAP_Y) / (H + GAP_Y)));
+
+      const usedW = COLS*W + (COLS-1)*GAP_X;
+      const usedH = ROWS*H + (ROWS-1)*GAP_Y;
+
+      const startXmm = (A4_W - usedW)/2;
+      const startYmm = (A4_H - usedH)/2;
+
+      // convertir mm->px (en canvas de preview, no es 300dpi; es escala visual)
+      const scaleX = (cw - 40) / A4_W;
+      const scaleY = (ch - 40) / A4_H;
+      const SCL = Math.min(scaleX, scaleY);
+
+      function mm2p(mm){ return 20 + mm * SCL; }
+
+      // título
+      a4ctx.fillStyle = "#0f172a";
+      a4ctx.font = "700 20px Arial";
+      a4ctx.fillText(`A4 - Polaroids ${s.name}`, 24, 40);
+
+      // filtrar items por tamaño
+      const list = items.filter(it => it.sizeKey === sizeKey);
+
+      // dibujar grid
+      a4ctx.strokeStyle = "#cbd5e1";
+      a4ctx.lineWidth = 1;
+
+      let idx = 0;
+      for(let r=0; r<ROWS; r++){
+        for(let c=0; c<COLS; c++){
+          const x = startXmm + c*(W+GAP_X);
+          const y = startYmm + r*(H+GAP_Y);
+
+          const px = mm2p(x);
+          const py = mm2p(y);
+          const pw = W * SCL;
+          const ph = H * SCL;
+
+          // marco
+          a4ctx.strokeRect(px, py, pw, ph);
+
+          // miniatura si hay
+          if(idx < list.length){
+            const it = list[idx++];
+            // dibujar imagen del canvas del item como preview
+            a4ctx.drawImage(it.canvas, px, py, pw, ph);
+          }else{
+            // vacío
+            a4ctx.fillStyle = "#f8fafc";
+            a4ctx.fillRect(px, py, pw, ph);
+            a4ctx.fillStyle = "#94a3b8";
+            a4ctx.font = "12px Arial";
+            a4ctx.fillText("vacío", px+8, py+18);
+          }
+        }
+      }
+
+      // contador
+      a4ctx.fillStyle = "#475569";
+      a4ctx.font = "14px Arial";
+      a4ctx.fillText(`Items en vista: ${list.length} | Total: ${items.length}`, 24, ch - 24);
+    }
+
+    // =======================
+    // PDF Export (agrupa por tamaño)
+    // =======================
+    $exportPdf.addEventListener('click', ()=>{
+      if(!items.length) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'mm', format:'a4', compress:true });
+
+      const A4_W = 210, A4_H = 297;
+      const GAP_X = 3, GAP_Y = 3;
+
+      // Agrupar por tamaño: primero 5x7, luego 7x9 (o al revés)
+      const groups = [
+        { key:"50x70", list: items.filter(i=>i.sizeKey==="50x70") },
+        { key:"70x90", list: items.filter(i=>i.sizeKey==="70x90") }
+      ].filter(g => g.list.length > 0);
+
+      let firstPage = true;
+
+      for(const g of groups){
+        const s = SIZES[g.key];
+        const W = s.wmm, H = s.hmm;
+
+        const COLS = Math.max(1, Math.floor((A4_W + GAP_X) / (W + GAP_X)));
+        const ROWS = Math.max(1, Math.floor((A4_H + GAP_Y) / (H + GAP_Y)));
+
+        const usedW = COLS*W + (COLS-1)*GAP_X;
+        const usedH = ROWS*H + (ROWS-1)*GAP_Y;
+
+        const startX = (A4_W - usedW)/2;
+        const startY = (A4_H - usedH)/2;
+
+        const perPage = COLS * ROWS;
+        const pages = Math.ceil(g.list.length / perPage);
+
+        let idx = 0;
+
+        for(let p=0; p<pages; p++){
+          if(!firstPage) doc.addPage('a4','portrait');
+          firstPage = false;
+
+          if($cropMarks.checked){
+            drawCropMarks(doc, startX, startY, W, H, GAP_X, GAP_Y, COLS, ROWS);
+          }
+
+          for(let r=0; r<ROWS; r++){
+            for(let c=0; c<COLS; c++){
+              if(idx >= g.list.length) break;
+
+              const it = g.list[idx++];
+              const x = startX + c*(W + GAP_X);
+              const y = startY + r*(H + GAP_Y);
+
+              // Imagen desde canvas (alta resolución, 300dpi interno)
+              const dataUrl = it.canvas.toDataURL('image/png', 1.0);
+              doc.addImage(dataUrl, 'PNG', x, y, W, H);
+
+              // borde externo vectorial (extra)
+              doc.setDrawColor(17, 24, 39);
+              doc.setLineWidth(0.5);
+              doc.rect(x, y, W, H);
+            }
+          }
+        }
+      }
+
+      doc.save('kuami_polaroids_A4.pdf');
+    });
+
+    function drawCropMarks(doc, startX, startY, W, H, gapX, gapY, cols, rows){
+      const len = 3;
+      doc.setDrawColor(180);
+      doc.setLineWidth(0.2);
+      for (let r=0;r<rows;r++){
+        for (let c=0;c<cols;c++){
+          const x = startX + c*(W+gapX);
+          const y = startY + r*(H+gapY);
+
+          doc.line(x,y,x+len,y); doc.line(x,y,x,y+len);
+          doc.line(x+W-len,y,x+W,y); doc.line(x+W,y,x+W,y+len);
+          doc.line(x,y+H,x+len,y+H); doc.line(x,y+H-len,x,y+H);
+          doc.line(x+W-len,y+H,x+W,y+H); doc.line(x+W,y+H-len,x+W,y+H);
+        }
+      }
+    }
+
+    // Init preview
+    drawA4Preview();
+
+    // Navbar shrink (opcional)
+    const nav = document.querySelector('.navbar');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+    document.addEventListener('scroll', onScroll); onScroll();
+  </script>
+</body>
+</html>
