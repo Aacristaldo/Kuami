@@ -452,8 +452,30 @@
       </button>
     </div>
   </div>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+  <h2 class="h5 m-0">Previsualización hoja A4</h2>
 
-  <canvas id="a4preview" class="a4canvas" width="1200" height="1700"></canvas>
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <button id="refreshPreview" class="btn btn-outline-primary btn-sm" type="button">
+      <i class="bi bi-arrow-clockwise"></i> Actualizar previsualización
+    </button>
+
+    <div class="btn-group" role="group" aria-label="Paginación">
+      <button id="prevPage" class="btn btn-outline-secondary btn-sm" type="button">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button id="nextPage" class="btn btn-outline-secondary btn-sm" type="button">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <span id="pageInfo" class="small-note">Página 1 de 1</span>
+  </div>
+</div>
+
+<canvas id="a4preview" class="a4canvas" width="1200" height="1700"></canvas>
+
+  
 </div>
 
 
@@ -473,7 +495,6 @@
   </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- jsPDF UMD -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
 
 <script>
@@ -484,9 +505,12 @@
   const MM_PER_IN = 25.4;
   const PX_PER_MM = DPI / MM_PER_IN;
 
+  // Más tamaños (podés ajustar márgenes a gusto)
   const SIZES = {
-    "50x70": { wmm:50, hmm:70, name:"5×7 cm", photo:{mlr:5, mt:6, mb:12}},
-    "70x90": { wmm:70, hmm:90, name:"7×9 cm", photo:{mlr:6, mt:7, mb:16}}
+    "50x70":  { wmm:50,  hmm:70,  name:"5×7 cm",    photo:{mlr:5,  mt:6,  mb:12} },
+    "60x80":  { wmm:60,  hmm:80,  name:"6×8 cm",    photo:{mlr:5.5,mt:6.5,mb:13} },
+    "70x90":  { wmm:70,  hmm:90,  name:"7×9 cm",    photo:{mlr:6,  mt:7,  mb:16} },
+    "90x110": { wmm:90,  hmm:110, name:"9×11 cm",   photo:{mlr:7,  mt:8,  mb:18} }
   };
 
   function mm2px(mm){ return Math.round(mm * PX_PER_MM); }
@@ -502,14 +526,108 @@
     });
   }
 
+  // Helpers: SVG -> Image
+  function svgToImg(svgString){
+    return new Promise((resolve, reject)=>{
+      const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = ()=> { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = (e)=> { URL.revokeObjectURL(url); reject(e); };
+      img.src = url;
+    });
+  }
+
+  // =======================
+  // Stickers (built-in)
+  // =======================
+  const STICKERS = {
+    none: { label: "Sin sticker", kind: "none" },
+    spotify: { label: "Spotify (ejemplo)", kind: "builtin", key: "spotify" },
+    heart: { label: "Corazón", kind: "builtin", key: "heart" },
+    birthday: { label: "Cumple", kind: "builtin", key: "birthday" },
+    upload: { label: "Subir PNG", kind: "upload" }
+  };
+
+  const BUILTIN_SVGS = {
+    heart: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80">
+        <rect width="240" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,14)">
+          <path d="M32 52s-18-10.6-26-22C-1 19 6 8 18 8c6 0 10 3 14 7c4-4 8-7 14-7c12 0 19 11 12 22C50 41.4 32 52 32 52z" fill="#ef476f"/>
+        </g>
+        <text x="86" y="50" font-family="Arial" font-size="28" font-weight="700" fill="#111827">Te amo</text>
+      </svg>
+    `,
+    birthday: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80">
+        <rect width="320" height="80" rx="14" fill="#ffffff"/>
+        <g transform="translate(18,10)">
+          <path d="M16 54h44v-8H16v8zm4-14h36c0-10-6-18-18-18S20 30 20 40z" fill="#20c997"/>
+          <path d="M38 10c6 4 2 10-2 12c-1-6-6-8 2-12z" fill="#ef476f"/>
+        </g>
+        <text x="86" y="50" font-family="Arial" font-size="26" font-weight="800" fill="#111827">Feliz cumple</text>
+      </svg>
+    `,
+    spotify: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="520" height="110" viewBox="0 0 520 110">
+        <rect width="520" height="110" rx="16" fill="#ffffff"/>
+        <!-- Logo tipo spotify -->
+        <g transform="translate(22,18)">
+          <circle cx="37" cy="37" r="32" fill="#1DB954"/>
+          <path d="M23 32c18-6 38-4 52 4" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".9"/>
+          <path d="M25 44c14-4 30-3 41 3" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".85"/>
+          <path d="M27 56c10-3 22-2 30 2" stroke="#0b1324" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"/>
+        </g>
+
+        <!-- “Código” estilo spotify (placeholder) -->
+        <g transform="translate(110,22)" fill="#0b1324">
+          <rect x="0"   y="10" width="6"  height="56" rx="3"/>
+          <rect x="14"  y="0"  width="6"  height="76" rx="3"/>
+          <rect x="28"  y="18" width="6"  height="40" rx="3"/>
+          <rect x="42"  y="6"  width="6"  height="64" rx="3"/>
+          <rect x="56"  y="14" width="6"  height="50" rx="3"/>
+          <rect x="70"  y="2"  width="6"  height="72" rx="3"/>
+          <rect x="84"  y="20" width="6"  height="36" rx="3"/>
+          <rect x="98"  y="8"  width="6"  height="60" rx="3"/>
+          <rect x="112" y="0"  width="6"  height="76" rx="3"/>
+          <rect x="126" y="16" width="6"  height="44" rx="3"/>
+          <rect x="140" y="6"  width="6"  height="64" rx="3"/>
+          <rect x="154" y="22" width="6"  height="32" rx="3"/>
+          <rect x="168" y="0"  width="6"  height="76" rx="3"/>
+          <rect x="182" y="10" width="6"  height="56" rx="3"/>
+          <rect x="196" y="18" width="6"  height="40" rx="3"/>
+          <rect x="210" y="6"  width="6"  height="64" rx="3"/>
+          <rect x="224" y="14" width="6"  height="50" rx="3"/>
+          <rect x="238" y="2"  width="6"  height="72" rx="3"/>
+          <rect x="252" y="20" width="6"  height="36" rx="3"/>
+          <rect x="266" y="8"  width="6"  height="60" rx="3"/>
+          <rect x="280" y="0"  width="6"  height="76" rx="3"/>
+          <rect x="294" y="16" width="6"  height="44" rx="3"/>
+          <rect x="308" y="6"  width="6"  height="64" rx="3"/>
+        </g>
+      </svg>
+    `
+  };
+
+  const BUILTIN_IMAGES = { heart:null, birthday:null, spotify:null };
+
+  async function ensureBuiltinStickers(){
+    const keys = Object.keys(BUILTIN_SVGS);
+    for(const k of keys){
+      if(BUILTIN_IMAGES[k]) continue;
+      BUILTIN_IMAGES[k] = await svgToImg(BUILTIN_SVGS[k]);
+    }
+  }
+
   // =======================
   // Estado
   // =======================
-  const items = []; // {id, sizeKey, img, url, canvas, ctx, scale, offX, offY, caption, zoomEl, sizeEl}
+  const items = [];
   let seq = 0;
 
   // Paginación preview A4
-  let currentPage = 0; // 0-based
+  let currentPage = 0;
 
   // =======================
   // DOM
@@ -524,10 +642,10 @@
   const $a4 = document.getElementById('a4preview');
   const a4ctx = $a4.getContext('2d');
 
-  // Controles paginación (asegurate de tenerlos en el HTML)
   const $prevPage = document.getElementById('prevPage');
   const $nextPage = document.getElementById('nextPage');
   const $pageInfo = document.getElementById('pageInfo');
+  const $refreshPreview = document.getElementById('refreshPreview');
 
   document.getElementById('yy').textContent = new Date().getFullYear();
 
@@ -557,6 +675,38 @@
 
   function coverScale(imgW, imgH, photoW, photoH){
     return Math.max(photoW/imgW, photoH/imgH);
+  }
+
+  function drawFooterSticker(ctx, it, W, H, MB){
+    // Dibuja sticker centrado en el área inferior (MB)
+    if(!it.footer || it.footer.mode === "none") return;
+
+    let img = null;
+
+    if(it.footer.mode === "builtin"){
+      img = BUILTIN_IMAGES[it.footer.key] || null;
+    } else if(it.footer.mode === "upload"){
+      img = it.footer.img || null;
+    }
+
+    if(!img) return;
+
+    // Área del pie: desde (H-MB) hasta H
+    const pad = mm2px(2);
+    const areaX = pad;
+    const areaY = H - MB + pad;
+    const areaW = W - pad*2;
+    const areaH = MB - pad*2;
+
+    // Mantener proporción
+    const scale = Math.min(areaW / img.width, areaH / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
+
+    const dx = areaX + (areaW - dw)/2;
+    const dy = areaY + (areaH - dh)/2;
+
+    ctx.drawImage(img, dx, dy, dw, dh);
   }
 
   function drawItem(it){
@@ -598,7 +748,7 @@
     ctx.lineWidth = mm2px(0.6);
     ctx.strokeRect(x, y, photoW, photoH);
 
-    // Pie
+    // Pie (texto)
     const cap = (it.caption || "").trim();
     if(cap){
       const fontPx = Math.round(3.5 * PX_PER_MM);
@@ -609,6 +759,9 @@
       ctx.fillText(cap, W/2, H - MB/2);
     }
 
+    // Sticker del pie (encima del texto si querés, o podés cambiar el orden)
+    drawFooterSticker(ctx, it, W, H, MB);
+
     // Marco externo
     ctx.strokeStyle = "#111827";
     ctx.lineWidth = mm2px(0.5);
@@ -618,6 +771,25 @@
   // =======================
   // Crear tarjeta
   // =======================
+  function buildSizeOptionsHTML(){
+    return Object.entries(SIZES)
+      .map(([k,v]) => `<option value="${k}">${v.name}</option>`)
+      .join("");
+  }
+
+  function buildStickerOptionsHTML(){
+    return Object.entries(STICKERS)
+      .map(([k,v]) => `<option value="${k}">${v.label}</option>`)
+      .join("");
+  }
+
+  function syncGlobalPreviewOptions(){
+    if(!$previewSize) return;
+    $previewSize.innerHTML = buildSizeOptionsHTML();
+    // Default
+    if(!SIZES[$previewSize.value]) $previewSize.value = "50x70";
+  }
+
   function createCard({img, url}){
     const id = ++seq;
 
@@ -633,10 +805,10 @@
       scale: baseScale,
       offX: 0,
       offY: 0,
-      caption: ""
+      caption: "",
+      footer: { mode: "none", key: null, img: null, url: null }
     };
 
-    // UI
     const card = document.createElement('div');
     card.className = 'p-card';
     card.dataset.id = String(id);
@@ -645,7 +817,7 @@
     topRow.className = 'd-flex justify-content-between align-items-center gap-2';
 
     const title = document.createElement('div');
-    title.innerHTML = `<div class="fw-semibold">Foto #${id}</div><div class="small-note">Elegí tamaño y ajustá encuadre.</div>`;
+    title.innerHTML = `<div class="fw-semibold">Foto #${id}</div><div class="small-note">Elegí tamaño, encuadre y pie.</div>`;
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn btn-outline-danger btn-sm';
@@ -672,21 +844,35 @@
     sizeCol.className = 'col-12 col-md-6';
     sizeCol.innerHTML = `
       <label class="form-label fw-semibold">Tamaño Polaroid</label>
-      <select class="form-select form-select-sm">
-        <option value="50x70">5×7 cm</option>
-        <option value="70x90">7×9 cm</option>
-      </select>
+      <select class="form-select form-select-sm">${buildSizeOptionsHTML()}</select>
     `;
     const sizeSel = sizeCol.querySelector('select');
+    sizeSel.value = sizeKey;
 
     // Caption
     const capCol = document.createElement('div');
     capCol.className = 'col-12 col-md-6';
     capCol.innerHTML = `
-      <label class="form-label fw-semibold">Pie (opcional)</label>
+      <label class="form-label fw-semibold">Pie (texto)</label>
       <input type="text" class="form-control form-control-sm" placeholder="Ej: Cumple de Ana">
     `;
     const capInput = capCol.querySelector('input');
+
+    // Sticker select + upload
+    const footerCol = document.createElement('div');
+    footerCol.className = 'col-12';
+    footerCol.innerHTML = `
+      <label class="form-label fw-semibold">Sticker en pie (opcional)</label>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <select class="form-select form-select-sm" style="max-width:260px">
+          ${buildStickerOptionsHTML()}
+        </select>
+        <input class="form-control form-control-sm" type="file" accept="image/png" style="max-width:260px; display:none" />
+        <span class="small-note">Subí PNG si elegís “Subir PNG”.</span>
+      </div>
+    `;
+    const footerSel = footerCol.querySelector('select');
+    const footerUpload = footerCol.querySelector('input[type="file"]');
 
     // Zoom
     const zoomCol = document.createElement('div');
@@ -702,22 +888,18 @@
     const zoomRange = zoomCol.querySelector('input[type="range"]');
     const recBtn = zoomCol.querySelector('button');
 
-    controls.append(sizeCol, capCol, zoomCol);
+    controls.append(sizeCol, capCol, footerCol, zoomCol);
 
     card.append(topRow, preview, controls);
     $cards.appendChild(card);
 
-    // Guardar refs
     it.canvas = canvas;
     it.ctx = ctx;
-    it.zoomEl = zoomRange;
-    it.sizeEl = sizeSel;
 
-    // Eventos UI
+    // Eventos
     sizeSel.addEventListener('change', ()=>{
       it.sizeKey = sizeSel.value;
 
-      // recalcular escala base (cover)
       const d = getDims(it.sizeKey);
       const newBase = coverScale(img.naturalWidth, img.naturalHeight, d.photoW, d.photoH);
 
@@ -728,14 +910,57 @@
       it.offY = 0;
 
       zoomRange.value = it.scale.toFixed(2);
-      drawItem(it);
 
+      drawItem(it);
       currentPage = 0;
       drawA4Preview();
     });
 
     capInput.addEventListener('input', ()=>{
       it.caption = capInput.value;
+      drawItem(it);
+      drawA4Preview();
+    });
+
+    footerSel.addEventListener('change', async ()=>{
+      const opt = footerSel.value;
+
+      // reset upload input
+      footerUpload.value = "";
+      footerUpload.style.display = (opt === "upload") ? "block" : "none";
+
+      if(opt === "none"){
+        it.footer = { mode:"none", key:null, img:null, url:null };
+      } else if(opt === "upload"){
+        it.footer = { mode:"upload", key:null, img:null, url:null };
+      } else {
+        // builtin
+        await ensureBuiltinStickers();
+        const cfg = STICKERS[opt];
+        it.footer = { mode:"builtin", key: cfg.key, img:null, url:null };
+      }
+
+      drawItem(it);
+      drawA4Preview();
+    });
+
+    footerUpload.addEventListener('change', async ()=>{
+      const f = footerUpload.files?.[0];
+      if(!f) return;
+      if(f.type !== "image/png"){
+        alert("Subí un PNG.");
+        footerUpload.value = "";
+        return;
+      }
+
+      // liberar anterior
+      if(it.footer?.url){
+        try{ URL.revokeObjectURL(it.footer.url); }catch(_){}
+      }
+
+      const { img:upImg, url:upUrl } = await loadImageFromFile(f);
+      it.footer = { mode:"upload", key:null, img:upImg, url:upUrl };
+
       drawItem(it);
       drawA4Preview();
     });
@@ -755,11 +980,9 @@
       drawA4Preview();
     });
 
-    delBtn.addEventListener('click', ()=>{
-      removeItem(it.id);
-    });
+    delBtn.addEventListener('click', ()=> removeItem(it.id));
 
-    // Drag en canvas (mover foto)
+    // Drag para mover encuadre
     let dragging = false;
     let lastX = 0, lastY = 0;
 
@@ -800,10 +1023,9 @@
       drawA4Preview();
     }, { passive:false });
 
-    // Inicial render
+    // Render inicial
     drawItem(it);
 
-    // Add state
     items.push(it);
     enableButtons();
 
@@ -815,14 +1037,16 @@
     const idx = items.findIndex(x => x.id === id);
     if(idx < 0) return;
 
+    // liberar URLs
     try{ URL.revokeObjectURL(items[idx].url); }catch(_){}
+    try{ if(items[idx].footer?.url) URL.revokeObjectURL(items[idx].footer.url); }catch(_){}
+
     items.splice(idx, 1);
 
     const card = $cards.querySelector(`[data-id="${id}"]`);
     if(card) card.remove();
 
     enableButtons();
-
     currentPage = 0;
     drawA4Preview();
   }
@@ -831,6 +1055,7 @@
   // Carga de imágenes
   // =======================
   $files.addEventListener('change', async (e)=>{
+    await ensureBuiltinStickers(); // carga stickers 1 vez (sin bloquear el resto)
     const files = Array.from(e.target.files || []);
     for(const f of files){
       if(!f.type.startsWith('image/')) continue;
@@ -848,13 +1073,24 @@
     while(items.length){
       const it = items.pop();
       try{ URL.revokeObjectURL(it.url); }catch(_){}
+      try{ if(it.footer?.url) URL.revokeObjectURL(it.footer.url); }catch(_){}
     }
     $cards.innerHTML = '';
     enableButtons();
-
     currentPage = 0;
     drawA4Preview();
   });
+
+  // =======================
+  // Refresh manual (botón)
+  // =======================
+  if($refreshPreview){
+    $refreshPreview.addEventListener('click', ()=>{
+      // Re-dibuja todas las tarjetas y la hoja
+      for(const it of items) drawItem(it);
+      drawA4Preview();
+    });
+  }
 
   // =======================
   // Paginación preview A4
@@ -874,33 +1110,34 @@
   // =======================
   // Previsualización A4
   // =======================
+  function syncAllSizeSelects(){
+    syncGlobalPreviewOptions();
+    // Nota: los selects de las tarjetas se generan al crear cada card
+  }
+
   $previewSize.addEventListener('change', ()=>{
     currentPage = 0;
     drawA4Preview();
   });
 
   function drawA4Preview(){
-    // A4 mm
     const A4_W = 210, A4_H = 297;
 
-    // canvas preview (px)
     const cw = $a4.width;
     const ch = $a4.height;
 
-    // limpiar
     a4ctx.clearRect(0,0,cw,ch);
 
-    // fondo hoja
+    // hoja
     a4ctx.fillStyle = "#ffffff";
     a4ctx.fillRect(0,0,cw,ch);
 
-    // borde hoja
     a4ctx.strokeStyle = "#e2e8f0";
     a4ctx.lineWidth = 2;
     a4ctx.strokeRect(10,10,cw-20,ch-20);
 
     const sizeKey = $previewSize.value;
-    const s = SIZES[sizeKey];
+    const s = SIZES[sizeKey] || SIZES["50x70"];
     const W = s.wmm, H = s.hmm;
 
     const GAP_X = 3, GAP_Y = 3;
@@ -914,7 +1151,6 @@
     const startXmm = (A4_W - usedW)/2;
     const startYmm = (A4_H - usedH)/2;
 
-    // escala visual
     const scaleX = (cw - 40) / A4_W;
     const scaleY = (ch - 40) / A4_H;
     const SCL = Math.min(scaleX, scaleY);
@@ -926,10 +1162,9 @@
     a4ctx.font = "700 20px Arial";
     a4ctx.fillText(`A4 - Polaroids ${s.name}`, 24, 40);
 
-    // filtrar items por tamaño
+    // items de ese tamaño
     const list = items.filter(it => it.sizeKey === sizeKey);
 
-    // paginación
     const perPage = COLS * ROWS;
     const totalPages = Math.max(1, Math.ceil(list.length / perPage));
     currentPage = clamp(currentPage, 0, totalPages - 1);
@@ -941,7 +1176,6 @@
     const start = currentPage * perPage;
     const pageItems = list.slice(start, start + perPage);
 
-    // dibujar grid
     a4ctx.strokeStyle = "#cbd5e1";
     a4ctx.lineWidth = 1;
 
@@ -971,7 +1205,6 @@
       }
     }
 
-    // contador
     a4ctx.fillStyle = "#475569";
     a4ctx.font = "14px Arial";
     a4ctx.fillText(
@@ -993,10 +1226,9 @@
     const A4_W = 210, A4_H = 297;
     const GAP_X = 3, GAP_Y = 3;
 
-    const groups = [
-      { key:"50x70", list: items.filter(i=>i.sizeKey==="50x70") },
-      { key:"70x90", list: items.filter(i=>i.sizeKey==="70x90") }
-    ].filter(g => g.list.length > 0);
+    const groups = Object.keys(SIZES)
+      .map(key => ({ key, list: items.filter(i => i.sizeKey === key) }))
+      .filter(g => g.list.length > 0);
 
     let firstPage = true;
 
@@ -1065,10 +1297,14 @@
     }
   }
 
-  // Init preview
-  drawA4Preview();
+  // Init
+  (async function init(){
+    syncAllSizeSelects();
+    await ensureBuiltinStickers();
+    drawA4Preview();
+  })();
 
-  // Navbar shrink (opcional)
+  // Navbar shrink
   const nav = document.querySelector('.navbar');
   const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
   document.addEventListener('scroll', onScroll); onScroll();
