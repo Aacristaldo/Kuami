@@ -428,12 +428,32 @@
 
         <!-- Previsualización A4 -->
         <div class="a4wrap">
-          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-            <h2 class="h5 m-0">Previsualización hoja A4</h2>
-            <div class="small-note">Vista previa (no a escala real en pantalla). El PDF sale en A4 real.</div>
-          </div>
-          <canvas id="a4preview" class="a4canvas" width="1200" height="1700"></canvas>
-        </div>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div>
+      <h2 class="h5 m-0">Previsualización hoja A4</h2>
+      <div class="small-note">Vista previa (no a escala real en pantalla). El PDF sale en A4 real.</div>
+    </div>
+
+    <!-- Controles de páginas -->
+    <div class="d-flex align-items-center gap-2">
+      <button id="prevPage" class="btn btn-outline-primary btn-sm" type="button" disabled>
+        <i class="bi bi-chevron-left"></i> Anterior
+      </button>
+
+      <span class="chip">
+        <i class="bi bi-files"></i>
+        <span id="pageInfo" class="small">Página 1 de 1</span>
+      </span>
+
+      <button id="nextPage" class="btn btn-outline-primary btn-sm" type="button" disabled>
+        Siguiente <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <canvas id="a4preview" class="a4canvas" width="1200" height="1700"></canvas>
+</div>
+
 
       </div>
 
