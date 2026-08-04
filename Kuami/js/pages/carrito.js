@@ -6,7 +6,12 @@
    - Modal checkout con captcha canvas
    - Generación de código de pedido
    - Apertura de WhatsApp con datos del cliente
+
+   Todo va adentro de una IIFE para que sus variables (getCart,
+   formatGs, updateCartBadge, etc.) no choquen con las funciones
+   globales que ya define utils.js — mismo motivo que en index.js.
    ============================================================ */
+(function () {
 
 const { getCart, setCart, formatGs, calcLine, updateCartBadge, showToast, PHONE_WA } = window.KuamiUtils;
 
@@ -320,3 +325,5 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ── Init ── */
 document.getElementById('yy').textContent = new Date().getFullYear();
 render();
+
+})(); // fin IIFE

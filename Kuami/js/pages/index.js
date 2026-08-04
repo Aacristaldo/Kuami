@@ -1,49 +1,22 @@
 /* ============================================================
-   js/pages/index.js — AUTOCONTENIDO (no depende de utils.js)
+   js/pages/index.js
+   Usa js/utils.js (window.KuamiUtils) como ÚNICA fuente de verdad
+   del carrito y las notificaciones de stock — es el mismo carrito
+   que después lee carrito.js en carrito.html. Por eso index.html
+   debe cargar js/utils.js ANTES de este archivo.
+
+   Todo va adentro de una IIFE para que sus variables (formatGs,
+   addToCart, etc.) no choquen con las funciones globales que ya
+   define utils.js. Sin esto, el navegador tira "Identifier ya
+   declarado" y el archivo entero deja de ejecutarse.
    ============================================================ */
+(function () {
 
-/* ── Constantes ── */
-const CART_KEY   = 'carritoKuami';
-const NOTIFY_KEY = 'kuami_notificaciones';
-
-/* ── Helpers propios ── */
-function _formatGs(n) {
-  return 'Gs. ' + (n || 0).toLocaleString('es-PY');
-}
-function _getCart()    { return JSON.parse(localStorage.getItem(CART_KEY)   || '[]'); }
-function _setCart(c)   { localStorage.setItem(CART_KEY,   JSON.stringify(c)); }
-function _getNotify()  { return JSON.parse(localStorage.getItem(NOTIFY_KEY) || '{}'); }
-function _setNotify(n) { localStorage.setItem(NOTIFY_KEY, JSON.stringify(n)); }
-
-function _saveNotify(productId, productName, channel, contact) {
-  const s = _getNotify();
-  s[productId] = { productId, productName, channel, contact, ts: new Date().toISOString() };
-  _setNotify(s);
-}
-function _getNotifyFor(productId) { return _getNotify()[productId] || null; }
-
-function _updateBadge() {
-  const n = _getCart().reduce((a, i) => a + (Number(i.qty) || 0), 0);
-  document.querySelectorAll('#cartCount').forEach(el => el.textContent = n);
-}
-
-function _showToast(msg) {
-  const el    = document.getElementById('addToast');
-  const msgEl = document.getElementById('toastMsg');
-  if (!el || !msgEl) return;
-  msgEl.textContent = msg;
-  bootstrap.Toast.getOrCreateInstance(el, { delay: 1800 }).show();
-}
-
-function _addToCart(item) {
-  const cart  = _getCart();
-  const found = cart.find(p => p.id === item.id);
-  const qty   = Math.max(1, parseInt(item.qty, 10) || 1);
-  if (found) { found.qty += qty; } else { cart.push({ ...item, qty }); }
-  _setCart(cart);
-  _updateBadge();
-  _showToast(item.name + ' agregado');
-}
+const {
+  formatGs, addToCart, updateCartBadge,
+  saveNotifyRequest, getNotifyForProduct,
+  setFooterYear
+} = window.KuamiUtils;
 
 /* ── Productos extra ── */
 /* Para cambiar stock: inStock: true / false */
@@ -117,7 +90,7 @@ function buildProductCard(e) {
           <h6 class="mb-1">${e.t}</h6>
           <div class="small text-secondary text-truncate">${e.cat}</div>
           <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="price">${_formatGs(e.p)}</span>
+            <span class="price">${formatGs(e.p)}</span>
           </div>
           ${outOfStock || e.isPhotoCalc ? `<div class="mt-2">${actionHtml}</div>` : actionHtml}
         </div>
@@ -171,7 +144,7 @@ function initAddToCart() {
     const row     = btn.closest('.product-add-row, .kc-add-row') || btn.parentElement;
     const qtyEl   = row ? row.querySelector('.qty-input') : null;
     const qty     = Math.max(1, parseInt(qtyEl?.value, 10) || 1);
-    _addToCart({
+    addToCart({
       id:    btn.dataset.id,
       name:  btn.dataset.name,
       price: parseInt(btn.dataset.price, 10) || 0,
@@ -227,7 +200,7 @@ function initFotoCalc() {
     elDet.textContent = state.mode === 'promo'
       ? `${combos} combo(s) de 25 + ${resto} unitarias`
       : `${qty} unitarias`;
-    elTot.textContent = _formatGs(total);
+    elTot.textContent = formatGs(total);
     state._c = { qty, unit, cp, combos, resto, total, mode: state.mode };
   }
 
@@ -241,7 +214,7 @@ function initFotoCalc() {
     state.qty = 1; state.mode = 'unit';
     document.getElementById('fotoCalcTitle').textContent = state.name;
     const meta = document.getElementById('fotoCalcMeta');
-    if (meta) meta.textContent = `${_formatGs(state.unit)} c/u${state.combo > 0 ? ' • Combo 25: ' + _formatGs(state.combo) : ''}`;
+    if (meta) meta.textContent = `${formatGs(state.unit)} c/u${state.combo > 0 ? ' • Combo 25: ' + formatGs(state.combo) : ''}`;
     const img = document.getElementById('fotoCalcImg');
     if (img) { img.src = state.img; img.alt = state.name; }
     if (elQty) elQty.value = 1;
@@ -258,7 +231,7 @@ function initFotoCalc() {
 
   document.getElementById('fotoCalcAdd')?.addEventListener('click', () => {
     const c = state._c || { qty:1, unit:state.unit, cp:state.combo||(state.unit*25), combos:0, resto:1, total:state.unit, mode:'unit' };
-    _addToCart({
+    addToCart({
       id: state.id, name: state.name, img: state.img,
       qty: c.qty, price: c.unit, mode: c.mode, comboPrice: c.cp,
       detail: c.mode === 'promo' ? `${c.combos} combo(s) de 25 + ${c.resto} unitarias` : `${c.qty} unitarias`
@@ -294,7 +267,7 @@ function initNotifyModal() {
     if (chanWA)    chanWA.checked = false;
     if (chanEmail) chanEmail.checked = false;
 
-    const ex = _getNotifyFor(pid);
+    const ex = getNotifyForProduct(pid);
     if (ex && okMsg) {
       okMsg.textContent = `Ya registraste un aviso (${ex.channel === 'wa' ? 'WhatsApp' : 'Email'}: ${ex.contact})`;
       okMsg.className = 'alert alert-info mt-2';
@@ -324,7 +297,7 @@ function initNotifyModal() {
     if (!contact) { addErr(isWA ? 'Ingresá tu número de WhatsApp.' : 'Ingresá tu correo.'); return; }
     if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) { addErr('El correo no es válido.'); return; }
 
-    _saveNotify(pid, pname, isWA ? 'wa' : 'email', contact);
+    saveNotifyRequest(pid, pname, isWA ? 'wa' : 'email', contact);
     if (inputWrap) inputWrap.classList.add('hidden');
     if (okMsg) {
       okMsg.textContent = `Listo! Te avisamos por ${isWA ? 'WhatsApp ' + contact : contact} cuando haya stock.`;
@@ -377,12 +350,6 @@ function initNavbar() {
   fn();
 }
 
-/* ── Año footer ── */
-function initYear() {
-  const el = document.getElementById('yy');
-  if (el) el.textContent = new Date().getFullYear();
-}
-
 /* ── Giro 3D de las tarjetas del catálogo ── */
 function initFlipCards() {
   document.querySelectorAll('.kc-flip').forEach(flip => {
@@ -421,6 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   initContactForm();
   initNavbar();
-  initYear();
-  _updateBadge();
+  setFooterYear();
+  updateCartBadge();
 });
+
+})(); // fin IIFE
