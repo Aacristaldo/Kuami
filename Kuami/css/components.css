@@ -1,0 +1,241 @@
+/* ============================================================
+   components.css — Navbar, botones, tarjetas, badges,
+                    toast, modal stock/notificación, FAB WA
+   ============================================================ */
+
+/* ── Navbar ── */
+.navbar {
+  backdrop-filter: saturate(180%) blur(10px);
+  background: rgba(4,115,37,.56);
+  border-bottom: 1px solid rgba(226,232,240,.6);
+  transition: background .25s, box-shadow .25s;
+}
+.navbar.scrolled {
+  background: rgba(55,153,71,.92);
+  box-shadow: 0 10px 30px rgba(2,6,23,.10);
+}
+.navbar .nav-link {
+  font-weight: 650;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: .45rem .85rem;
+  transition: transform .18s, box-shadow .18s, background .18s, color .18s;
+  position: relative;
+}
+.navbar .nav-link:hover {
+  background: var(--pri-lt);
+  color: var(--pri);
+  transform: translateY(-1px);
+}
+.navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 14px; right: 14px; bottom: 6px;
+  height: 2px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--pri), var(--acc));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .18s;
+}
+.navbar .nav-link:hover::after,
+.navbar .nav-link.active::after { transform: scaleX(1); }
+.navbar .nav-link.active { background: rgba(20,83,45,.12); color: var(--pri); }
+.navbar .navbar-toggler { border-color: rgba(15,23,42,.18); }
+.navbar .navbar-toggler-icon { filter: invert(.2); }
+
+/* ── Cart badge ── */
+.cart-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px; height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 4px;
+  transition: transform .2s;
+}
+.cart-count.bump { transform: scale(1.4); }
+
+/* ── Botones base ── */
+.btn-pri {
+  background: linear-gradient(180deg, var(--pri), #0f3d23);
+  border: 1px solid rgba(20,83,45,.55);
+  color: #fff;
+  transition: transform .2s, box-shadow .2s, filter .2s;
+}
+.btn-pri:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(20,83,45,.22);
+  color: #fff;
+}
+.btn-ghost {
+  border: 1px solid rgba(20,83,45,.35);
+  color: var(--pri);
+  background: rgba(255,255,255,.65);
+  transition: background .18s, border-color .18s;
+}
+.btn-ghost:hover {
+  background: var(--pri-lt);
+  border-color: rgba(20,83,45,.55);
+  color: var(--pri);
+}
+.btn-ig {
+  background: linear-gradient(135deg,#F58529,#DD2A7B,#8134AF);
+  color: #fff !important;
+  border: none;
+}
+.btn-ig:hover { filter: brightness(1.08); color: #fff; }
+
+/* ── Botón tile (hero) ── */
+.btn-tile {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 22px;
+  border-radius: var(--r-md);
+  font-weight: 600; font-size: 1rem;
+  min-width: 200px; justify-content: center;
+  transition: transform .25s, box-shadow .25s;
+}
+.btn-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+  color: #fff;
+}
+.tile-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-size: 1.3rem;
+  background: rgba(255,255,255,.18);
+}
+
+/* ── btn-outline-primary override ── */
+.btn-outline-primary {
+  --bs-btn-color:              var(--pri);
+  --bs-btn-border-color:       rgba(20,83,45,.35);
+  --bs-btn-hover-bg:           var(--pri-lt);
+  --bs-btn-hover-border-color: rgba(20,83,45,.55);
+  --bs-btn-hover-color:        var(--pri);
+  --bs-btn-active-bg:          rgba(20,83,45,.14);
+  --bs-btn-active-border-color:rgba(20,83,45,.60);
+}
+
+/* ── Tarjeta producto ── */
+.product-card {
+  background: var(--card);
+  border: 1px solid rgba(226,232,240,.75);
+  transition: transform .25s, box-shadow .25s;
+  position: relative; /* para badges absolutos */
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.product-card img {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-top-left-radius: .75rem;
+  border-top-right-radius: .75rem;
+}
+
+/* ── Badges de stock ── */
+.badge-stock-out {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--stock-badge-bg);
+  border: 1px solid var(--stock-badge-bdr);
+  color: var(--stock-badge-txt);
+  font-size: .75rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+.badge-save { background: var(--acc); color: var(--acc-dk); }
+.badge-new  { background: var(--info); color: #fff; }
+
+/* Tarjeta sin stock: imagen con overlay */
+.product-card.out-of-stock img {
+  filter: grayscale(55%) opacity(.75);
+}
+
+/* ── Botón "Avisame" ── */
+.btn-notify {
+  background: var(--notify-bg);
+  border: 1px solid var(--notify-bdr);
+  color: var(--warn);
+  font-size: .8rem;
+  font-weight: 700;
+  border-radius: var(--r-sm);
+  padding: 6px 12px;
+  transition: background .18s;
+  white-space: nowrap;
+}
+.btn-notify:hover {
+  background: rgba(245,158,11,.18);
+  color: var(--warn);
+}
+
+/* ── Modal Avisame ── */
+.notify-channel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--soft);
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+}
+.notify-channel:hover {
+  border-color: var(--pri);
+  background: var(--pri-lt);
+}
+.notify-channel input[type="radio"] { accent-color: var(--pri); }
+.notify-channel .nc-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.notify-channel .nc-icon.wa  { background: #dcfce7; color: #16a34a; }
+.notify-channel .nc-icon.mail{ background: #eff6ff; color: #3b82f6; }
+.notify-channel .nc-body strong { display: block; font-weight: 700; }
+.notify-channel .nc-body small  { color: var(--muted); }
+
+#notifyInputWrap { transition: opacity .2s, max-height .3s; overflow: hidden; }
+#notifyInputWrap.hidden { opacity: 0; max-height: 0; pointer-events: none; }
+#notifyInputWrap.visible { opacity: 1; max-height: 120px; }
+
+/* ── Toast ── */
+.toast { border-radius: var(--r-md) !important; }
+
+/* ── FAB WhatsApp ── */
+.wa-fab {
+  position: fixed; right: 16px; bottom: 16px;
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #22c55e; color: #fff;
+  box-shadow: 0 10px 22px rgba(2,6,23,.22);
+  z-index: 1080;
+  transition: opacity .2s, transform .2s;
+}
+.wa-fab:hover { opacity: .92; transform: scale(1.06); }
+
+/* ── Accesibilidad: focus ── */
+.btn:focus-visible,
+.navbar .nav-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 .25rem rgba(132,204,22,.25);
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar .nav-link,
+  .btn, .product-card,
+  .ig-img { transition: none !important; }
+}

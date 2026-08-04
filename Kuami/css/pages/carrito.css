@@ -1,0 +1,15 @@
+/* ============================================================
+   pages/carrito.css — Estilos específicos del carrito
+   ============================================================ */
+
+.navbar { backdrop-filter: saturate(180%) blur(10px); }
+.navbar.scrolled {
+  box-shadow: 0 6px 24px rgba(0,0,0,.08);
+  background: #ffffffd6;
+}
+
+.thumb {
+  width: 64px; height: 64px;
+  object-fit: cover;
+  border-radius: var(--r-sm, .5rem);
+}

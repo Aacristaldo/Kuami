@@ -3,27 +3,142 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Carrito | kuami</title>
+  <title>Carrito | Kuami</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    :root{ --pri:#0a4c8b; --sec:#ef476f }
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif}
-    .navbar{backdrop-filter:saturate(180%) blur(10px)}
-    .navbar.scrolled{box-shadow:0 6px 24px rgba(0,0,0,.08);background:#ffffffd6}
-    .cart-count{background:#dc3545;color:#fff;border-radius:999px;font-size:.7rem;line-height:1;padding:.20rem .38rem;min-width:20px;text-align:center}
-    .thumb{width:64px;height:64px;object-fit:cover;border-radius:.5rem}
-    .price{font-weight:800;color:var(--sec)}
-  </style>
+
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/carrito.css">
 </head>
+
+<!-- =====================================================
+     MODAL: Datos para pedido
+     ===================================================== -->
+<div class="modal fade" id="modalCheckout" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title">Finalizar pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="checkoutForm" class="needs-validation" novalidate>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label">Nombre</label>
+              <input id="ckNombre" class="form-control" required>
+              <div class="invalid-feedback">Ingresá tu nombre.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Apellido</label>
+              <input id="ckApellido" class="form-control" required>
+              <div class="invalid-feedback">Ingresá tu apellido.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Teléfono</label>
+              <input id="ckTelefono" class="form-control" inputmode="numeric" placeholder="Ej: 0984..." required>
+              <div class="invalid-feedback">Ingresá tu teléfono.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Cédula</label>
+              <input id="ckCedula" class="form-control" inputmode="numeric" placeholder="Ej: 1234567" required>
+              <div class="invalid-feedback">Ingresá tu cédula.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Correo</label>
+              <input id="ckCorreo" type="email" class="form-control" placeholder="tu@email.com" required>
+              <div class="invalid-feedback">Ingresá un correo válido.</div>
+            </div>
+          </div>
+
+          <hr class="my-3">
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="ckFactura">
+            <label class="form-check-label" for="ckFactura">Preciso factura</label>
+          </div>
+
+          <div id="facturaBox" class="border rounded-3 p-3 mt-2 d-none">
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">RUC / Cédula</label>
+                <input id="ckRuc" class="form-control" placeholder="Se completa con tu cédula">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Razón social</label>
+                <input id="ckRazon" class="form-control" placeholder="Se completa con tu nombre">
+              </div>
+            </div>
+            <div class="form-text">Podés editar estos datos si necesitás.</div>
+          </div>
+
+          <hr class="my-3">
+
+          <div class="border rounded-3 p-3">
+            <div class="fw-semibold mb-2">Verificación</div>
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+              <canvas id="captchaCanvas" width="170" height="54" class="border rounded-3"></canvas>
+              <div class="flex-grow-1" style="min-width:220px">
+                <input id="ckCaptchaA" class="form-control" placeholder="Escribí el texto" required>
+                <div class="invalid-feedback">Ingresá el captcha.</div>
+                <div class="text-danger small mt-1 d-none" id="ckCaptchaErr">Captcha incorrecto.</div>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="ckCaptchaRefresh">
+                  Cambiar captcha
+                </button>
+              </div>
+            </div>
+            <div class="form-text mt-2">No distingue mayúsculas/minúsculas.</div>
+          </div>
+
+          <div class="mt-3 d-grid">
+            <button type="submit" class="btn btn-primary" id="btnGenerarPedido">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     MODAL: Pedido generado
+     ===================================================== -->
+<div class="modal fade" id="modalPedidoOk" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title">Pedido generado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="pedidoOkMsg">Pedido generado, ¡muchas gracias! Nos pondremos en contacto con vos.</div>
+        <div class="mt-3">
+          <label class="form-label text-secondary mb-1">Código de consulta</label>
+          <div class="d-flex gap-2">
+            <input id="pedidoCodigo" class="form-control" readonly>
+            <button type="button" class="btn btn-outline-secondary" id="btnCopiarCodigo">Copiar</button>
+          </div>
+          <div class="form-text">Guardá este código para consultar el estado de tu pedido en la web.</div>
+        </div>
+        <div class="d-grid mt-3">
+          <button class="btn btn-success" id="btnAbrirWhatsApp">Finalizar pedido por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <body>
+
+<!-- NAV -->
 <nav class="navbar navbar-expand-lg fixed-top bg-white">
   <div class="container">
     <a class="navbar-brand fw-bold d-flex align-items-center" href="index.html">
-      <img src="assets/logo.png" alt="Logo" height="40" class="me-2"> kuami
+      <img src="assets/logo.png" alt="Logo" height="40" class="me-2">
     </a>
     <div class="ms-auto d-flex gap-2">
-      <a href="herramientas.html" class="btn btn-outline-primary"><i class="bi bi-tools"></i> Herramientas</a>
       <a href="index.html" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Seguir comprando</a>
     </div>
   </div>
@@ -72,6 +187,7 @@
         </div>
       </div>
     </div>
+
     <div class="col-lg-6">
       <div class="card p-3">
         <h5 class="mb-3">Resumen</h5>
@@ -82,9 +198,7 @@
         </ul>
         <div class="d-flex gap-2">
           <button id="clearBtn" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Vaciar</button>
-          <a id="waBtn" class="btn btn-success flex-grow-1" target="_blank" rel="noopener">
-            <i class="bi bi-whatsapp me-1"></i> Finalizar por WhatsApp
-          </a>
+          <a id="waBtn" class="btn btn-success flex-grow-1" target="_blank" rel="noopener">Generar Pedido</a>
         </div>
       </div>
     </div>
@@ -92,126 +206,13 @@
 </main>
 
 <footer class="py-4 bg-light">
-  <div class="container text-center small">© <span id="yy"></span> kuami</div>
+  <div class="container text-center small">© <span id="yy"></span> Kuami</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  /* ===== Estado y utilidades ===== */
-  const CART_KEY = 'carritoKuami';
-  const PHONE_WA = '595984024413';
-  const getCart = () => JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-  const setCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
-  const formatGs = n => 'Gs. ' + (n||0).toLocaleString('es-PY');
 
-  const els = {
-    body: document.getElementById('cartBody'),
-    empty: document.getElementById('empty'),
-    count: document.getElementById('count'),
-    subtotal: document.getElementById('subtotal'),
-    ship: document.getElementById('ship'),
-    total: document.getElementById('total'),
-    shippingSel: document.getElementById('shipping'),
-    notes: document.getElementById('notes'),
-    waBtn: document.getElementById('waBtn'),
-    clearBtn: document.getElementById('clearBtn')
-  };
-
-  function render(){
-    const cart = getCart();
-    els.body.innerHTML = '';
-    let sub = 0;
-    cart.forEach(item=>{
-      const row = document.createElement('tr');
-      const subtotal = (item.price||0) * (item.qty||1);
-      sub += subtotal;
-      row.innerHTML = `
-        <td><img class="thumb" src="${item.img}" alt="${item.name}"></td>
-        <td class="fw-semibold">${item.name}</td>
-        <td class="text-end">${formatGs(item.price)}</td>
-        <td class="text-center">
-          <input type="number" class="form-control form-control-sm qty" data-id="${item.id}" value="${item.qty||1}" min="1">
-        </td>
-        <td class="text-end">${formatGs(subtotal)}</td>
-        <td class="text-end"><button class="btn btn-sm btn-outline-danger rm" data-id="${item.id}" title="Quitar"><i class="bi bi-x-lg"></i></button></td>
-      `;
-      els.body.appendChild(row);
-    });
-
-    const ship = parseInt(els.shippingSel.value,10) || 0;
-    els.subtotal.textContent = formatGs(sub);
-    els.ship.textContent = formatGs(ship);
-    els.total.textContent = formatGs(sub + ship);
-
-    const totalQty = cart.reduce((a,i)=>a+(i.qty||0),0);
-    els.count.textContent = totalQty;
-
-    const empty = cart.length === 0;
-    document.getElementById('cartTable').classList.toggle('d-none', empty);
-    els.empty.classList.toggle('d-none', !empty);
-
-    buildWA();
-  }
-
-  document.addEventListener('input', (e)=>{
-    if(e.target.classList.contains('qty')){
-      const id = e.target.dataset.id;
-      let val = parseInt(e.target.value,10);
-      if(!Number.isFinite(val) || val<1){ val = 1; e.target.value = 1; }
-      const cart = getCart();
-      const it = cart.find(i=>i.id===id);
-      if(it){ it.qty = val; setCart(cart); render(); }
-    }
-  });
-
-  document.addEventListener('click', (e)=>{
-    if(e.target.closest('.rm')){
-      const id = e.target.closest('.rm').dataset.id;
-      const cart = getCart().filter(i=>i.id !== id);
-      setCart(cart); render();
-    }
-  });
-
-  els.shippingSel.addEventListener('change', render);
-
-  els.clearBtn.addEventListener('click', ()=>{
-    if(confirm('¿Vaciar el carrito?')){ localStorage.setItem(CART_KEY, '[]'); render(); }
-  });
-
-  function buildWA(){
-    const cart = getCart();
-    if(cart.length === 0){
-      els.waBtn.removeAttribute('href');
-      els.waBtn.classList.add('disabled');
-      return;
-    }
-    els.waBtn.classList.remove('disabled');
-
-    const ship = parseInt(els.shippingSel.value,10) || 0;
-    const sub = cart.reduce((a,i)=>a + (i.price*i.qty), 0);
-    const tot = sub + ship;
-
-    const lines = [];
-    lines.push('Hola, quiero hacer este pedido:');
-    cart.forEach(i=>{
-      lines.push(`• ${i.name} x${i.qty} — ${formatGs(i.price*i.qty)}`);
-    });
-    lines.push(`Subtotal: ${formatGs(sub)}`);
-    lines.push(`Envío: ${formatGs(ship)}`);
-    lines.push(`Total: ${formatGs(tot)}`);
-    const notes = (els.notes.value||'').trim();
-    if(notes){ lines.push(`Notas: ${notes}`); }
-    lines.push('');
-    lines.push('Datos: Nombre y barrio: ________ | Tel: ________');
-
-    const msg = encodeURIComponent(lines.join('\n'));
-    els.waBtn.href = `https://wa.me/${PHONE_WA}?text=${msg}`;
-
-    
-  }
-
-  document.getElementById('yy').textContent = new Date().getFullYear();
-  render();
-</script>
+<!-- JS propio -->
+<script src="js/utils.js"></script>
+<script src="js/pages/carrito.js" defer></script>
 </body>
 </html>

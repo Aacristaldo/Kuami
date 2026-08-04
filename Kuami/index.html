@@ -3,154 +3,182 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>kuami</title>
+  <title>Kuami — Ramos, fotos y detalles personalizados</title>
   <meta name="description" content="Ramos tejidos, girasoles y detalles personalizados. Pedidos por WhatsApp e Instagram.">
-  <meta property="og:title" content="Tienda de Detalles">
+  <meta property="og:title"       content="Kuami — Tienda de Detalles">
   <meta property="og:description" content="Ramos tejidos, girasoles y detalles personalizados.">
-  <meta property="og:image" content="assets/img01.jpg">
+  <meta property="og:image"       content="assets/productos/img01.jpg">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages/index.css">
+
+  <!-- ============================================================
+       Estilos de la lógica unificada de producto:
+       - selector de cantidad (qty-stepper)
+       - botón "ver" tipo lupa sobre la imagen
+       - animación del modal de imagen
+       Se agregan acá para no tocar los .css existentes sin verlos.
+       Cuando confirmes el resultado, podés moverlos a components.css.
+       ============================================================ -->
   <style>
-    :root{ --pri:#0a4c8b; --sec:#ef476f; --ink:#0f6bbc; --soft:#f5f9fc; --ok:#20c997 }
-    html{scroll-padding-top:84px}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;color:var(--ink);background:#fff}
-    .navbar{backdrop-filter:saturate(180%) blur(10px)}
-    .navbar.scrolled{box-shadow:0 6px 24px rgba(0,0,0,.08);background:#ffffffd6}
-    .btn-pri{background:var(--pri);border-color:var(--pri)}
-    .btn-pri:hover{background:#1060aa;border-color:#0a6fce}
-    .btn-ghost{border:1px solid var(--pri);color:var(--pri);background:transparent}
-    .btn-ghost:hover{background:var(--pri);color:#fff}
-    /* Hero */
-    .hero{
-      position:relative;min-height:82vh;display:grid;place-items:center;
-      background-image:linear-gradient(0deg, rgba(10,76,139,.20), rgba(10,76,139,.20)),url('assets/img01.jpg');
-      background-repeat:no-repeat;background-size:cover;background-position:center 35%;background-attachment:scroll;
+    /* Selector de cantidad — mismo componente en toda la página */
+    .qty-stepper{
+      display:flex; align-items:center; border:1px solid var(--bs-border-color,#dee2e6);
+      border-radius:10px; overflow:hidden; height:36px; flex:0 0 auto;
     }
-    @media (min-width: 992px){ .hero{background-position:center center;background-attachment:fixed} }
-    .hero .card{backdrop-filter: blur(6px);background:#175502d9;color:#fff}
-    .hero .card h1,.hero .card p,.hero .card .small,.hero .card .text-muted{color:#fff!important}
-    section{padding:72px 0}
-    .section-title{font-weight:800}
-    .product-card{transition:transform .25s ease, box-shadow .25s ease;border:0}
-    .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
-    .product-card img{aspect-ratio:1/1;object-fit:cover;border-top-left-radius:.75rem;border-top-right-radius:.75rem}
-    .filter-pill{cursor:pointer}
-    .price{font-weight:800;color:var(--sec)}
-    .promo{border:0;background:linear-gradient(180deg,#fff, var(--soft))}
-    .badge-save{background:var(--ok)}
-    .count{font-variant-numeric:tabular-nums}
-    .ig-img{aspect-ratio:1/1;object-fit:cover;border-radius:1rem;transition:transform .2s}
-    .ig-img:hover{transform:scale(1.02)}
-    .contact-card{border:0;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-    footer{background:#0b1020;color:#aab}
-    footer a{color:#dde}
-    .wa-fab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#25D366;color:#fff;box-shadow:0 10px 20px rgba(0,0,0,.2);z-index:1080}
-    .wa-fab:hover{opacity:.9}
-    /* Botón Instagram */
-    .btn-ig{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border:1px solid #dfe3ea;border-radius:.65rem;background:#fff;color:#1f2a37;text-decoration:none;font-weight:600;transition:box-shadow .2s, transform .2s, background-color .2s}
-    .btn-ig:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-1px)}
-    .btn-ig:active{transform:translateY(0)}
-    .btn-ig .ig-icon{width:20px;height:20px;flex:none;border-radius:.4rem;transition:transform .2s, filter .2s;box-shadow:0 6px 14px rgba(0,0,0,.18)}
-    .btn-ig:hover .ig-icon{transform:scale(1.05);filter:saturate(1.1)}
-    @media (prefers-reduced-motion: reduce){.btn-ig,.btn-ig .ig-icon{transition:none}}
-    /* Carrito badge */
-    .cart-link{position:relative}
-    .cart-count{position:absolute;top:-6px;right:-10px;background:#dc3545;color:#fff;border-radius:999px;font-size:.7rem;line-height:1;padding:.20rem .38rem;min-width:20px;text-align:center}
- 
- /* ===== NAV: hover / activo para links y botones ===== */
+    .qty-stepper .qty-btn{
+      width:32px; height:100%; border:0; background:#f5f5f7; font-size:1.1rem;
+      line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    }
+    .qty-stepper .qty-btn:hover{ background:#ececef; }
+    .qty-stepper .qty-input{
+      width:38px; height:100%; border:0; border-left:1px solid #eee; border-right:1px solid #eee;
+      text-align:center; -moz-appearance:textfield; font-weight:600;
+    }
+    .qty-stepper .qty-input::-webkit-outer-spin-button,
+    .qty-stepper .qty-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
 
-/* Asegura que el navbar tenga transición suave */
-.navbar .nav-link,
-.navbar .btn{
-  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
-}
+    /* Fila estándar: cantidad + agregar, en cards del grid */
+    .product-add-row{ display:flex; align-items:center; gap:6px; margin-top:.5rem; }
+    .product-add-row .btn-add{ flex:1 1 auto; }
 
-/* Links del menú (Productos, Promos, etc.) */
-.navbar .nav-link{
-  position:relative;
-  font-weight:600;
-  color:#1f2a37; /* o usa var(--pri) si querés */
-  border-radius:999px;
-  padding:.45rem .85rem;
-}
+    /* Fila estándar dentro de las kc-card (catálogo con flip) */
+    .kc-add-row{ display:flex; align-items:center; gap:8px; }
+    .kc-add-row .kc-add{ flex:1 1 auto; }
 
-/* Fondo y "subrayado" tipo pill al hover */
-.navbar .nav-link:hover{
-  background: rgba(10,76,139,.12);
-  color: var(--pri);
-  transform: translateY(-1px);
-}
+    /* Botón "ver" tipo lupa, sobre la imagen, en vez de competir con Agregar */
+    .kc-media{ position:relative; }
+    .kc-zoom, .pc-zoom{
+      position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%;
+      border:0; background:rgba(255,255,255,.92); box-shadow:0 2px 6px rgba(0,0,0,.15);
+      display:flex; align-items:center; justify-content:center; color:#333;
+      opacity:0; transform:scale(.85); transition:opacity .18s ease, transform .18s ease;
+      z-index:2;
+    }
+    .kc-flip:hover .kc-zoom, .product-card:hover .pc-zoom,
+    .kc-zoom:focus-visible, .pc-zoom:focus-visible{ opacity:1; transform:scale(1); }
+    .product-card{ position:relative; }
+    .product-card > img, .product-card .pc-media{ position:relative; }
 
-/* Línea inferior animada */
-.navbar .nav-link::after{
-  content:"";
-  position:absolute;
-  left:14px;
-  right:14px;
-  bottom:6px;
-  height:2px;
-  border-radius:999px;
-  background: linear-gradient(90deg, var(--pri), var(--sec));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .18s ease;
-  opacity:.95;
-}
-.navbar .nav-link:hover::after{ transform: scaleX(1); }
+    /* Zoom suave de la imagen al pasar el mouse */
+    .product-card img, .kc-media img{ transition:transform .35s ease; }
+    .product-card:hover img, .kc-flip:hover .kc-media img{ transform:scale(1.04); }
 
-/* Link activo (si usás .active en el link actual) */
-.navbar .nav-link.active{
-  background: rgba(10,76,139,.16);
-  color: var(--pri);
-}
-.navbar .nav-link.active::after{ transform: scaleX(1); }
+    /* Animación del modal "Ver" — entra con fade + leve escala */
+    #modalImg .modal-content{ transition:transform .25s ease, opacity .25s ease; }
+    #modalImg.fade .modal-dialog{ transform:scale(.94); transition:transform .3s ease; }
+    #modalImg.show .modal-dialog{ transform:scale(1); }
 
-/* Botón WhatsApp */
-.navbar .btn-pri:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(10,76,139,.22);
-  filter: saturate(1.05);
-}
-
-/* Botón Carrito (outline) */
-.navbar .btn-outline-primary:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(10,76,139,.16);
-}
-
-/* Badge del carrito un poco más visible en hover del botón */
-.navbar .cart-link:hover .cart-count{
-  transform: scale(1.08);
-  box-shadow: 0 10px 18px rgba(220,53,69,.28);
-}
-
-/* Accesibilidad: foco con teclado */
-.navbar .nav-link:focus-visible,
-.navbar .btn:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 .25rem rgba(10,76,139,.25);
-}
-
-/* Si el usuario tiene reduce motion */
-@media (prefers-reduced-motion: reduce){
-  .navbar .nav-link,
-  .navbar .btn,
-  .navbar .nav-link::after{
-    transition:none !important;
-  }
-}
-
- 
- 
- 
- 
- 
- 
- 
- 
- </style>
+    @media (max-width: 576px){
+      .kc-zoom, .pc-zoom{ opacity:1; transform:scale(1); } /* en mobile no hay hover: siempre visible */
+    }
+  </style>
 </head>
+
 <body>
+
+<!-- MODAL: Calculadora de fotos -->
+<div class="modal fade" id="modalFotoCalc" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title">Pedido de fotos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex gap-3 align-items-center mb-3">
+          <img id="fotoCalcImg" src="" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:14px;">
+          <div class="flex-grow-1">
+            <div class="fw-semibold" id="fotoCalcTitle">Fotos</div>
+            <div class="text-secondary small" id="fotoCalcMeta">Tamaño / precio</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Cantidad de fotos</label>
+          <input id="fotoCalcQty" type="number" min="1" value="1" class="form-control">
+          <div class="form-text">Si pedís 25 o más, podés aplicar promo por combo de 25.</div>
+        </div>
+        <div id="promoBox" class="border rounded-3 p-3 d-none">
+          <div class="fw-semibold mb-2">Promo 25 fotos</div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="promoMode" id="promoYes" value="promo">
+            <label class="form-check-label" for="promoYes">Usar promo (calcular combos de 25)</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="promoMode" id="promoNo" value="unit" checked>
+            <label class="form-check-label" for="promoNo">Mantener precios unitarios</label>
+          </div>
+        </div>
+        <hr class="my-3">
+        <div class="d-grid gap-2">
+          <div class="d-flex justify-content-between"><span class="text-secondary">Detalle</span><span class="fw-semibold" id="fotoCalcDetalle">—</span></div>
+          <div class="d-flex justify-content-between"><span class="text-secondary">Total</span><span class="fw-bold" id="fotoCalcTotal">Gs. 0</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button id="fotoCalcAdd" class="btn btn-primary">Agregar al carrito</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ver imagen -->
+<div class="modal fade" id="modalImg" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"></h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <img src="" alt="" class="w-100 rounded-4" style="aspect-ratio:4/3;object-fit:cover">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Avisame -->
+<div class="modal fade" id="modalAvisame" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title mb-0">Avisame cuando haya stock</h5>
+          <small class="text-secondary" id="avisameTitle"></small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-secondary mb-3">Cuando este producto vuelva a estar disponible, te avisamos. Elegí cómo:</p>
+        <label class="notify-channel mb-2" style="display:flex">
+          <input type="radio" name="notifyChan" id="chanWA" value="wa" class="me-2 mt-1">
+          <span class="nc-icon wa me-3"><i class="bi bi-whatsapp"></i></span>
+          <span class="nc-body"><strong>WhatsApp</strong><small>Te escribimos cuando tengamos stock.</small></span>
+        </label>
+        <label class="notify-channel" style="display:flex">
+          <input type="radio" name="notifyChan" id="chanEmail" value="email" class="me-2 mt-1">
+          <span class="nc-icon mail me-3"><i class="bi bi-envelope"></i></span>
+          <span class="nc-body"><strong>Email</strong><small>Recibís un correo automático (próximamente).</small></span>
+        </label>
+        <div id="notifyInputWrap" class="mt-3 hidden">
+          <label class="form-label" id="notifyInputLabel">Tu número</label>
+          <input id="notifyInput" type="tel" class="form-control" placeholder="">
+        </div>
+        <div id="avisameSuccess" class="d-none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button id="btnGuardarAviso" class="btn btn-pri"><i class="bi bi-bell me-1"></i>Guardar aviso</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="navbar navbar-expand-lg fixed-top py-3">
@@ -158,26 +186,26 @@
     <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
       <img src="assets/logo.png" alt="Logo" height="40" class="me-2">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="nav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
         <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#catalogo">Polaroids</a></li>
+        <li class="nav-item"><a class="nav-link" href="#extras">Extras</a></li>
         <li class="nav-item"><a class="nav-link" href="#promos">Promos</a></li>
         <li class="nav-item"><a class="nav-link" href="#instagram">Instagram</a></li>
         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-
-        <!-- NUEVO -->
-        <li class="nav-item"><a class="nav-link" href="herramientas.html">Herramientas</a></li>
-
+        <li class="nav-item"><a class="nav-link" href="seguimiento.html">Tracking</a></li>
         <li class="nav-item ms-lg-2">
           <a class="btn btn-sm btn-pri" href="https://wa.me/595984024413?text=Hola%20quiero%20hacer%20un%20pedido" target="_blank" rel="noopener">
             <i class="bi bi-whatsapp me-1"></i>WhatsApp
           </a>
         </li>
         <li class="nav-item ms-lg-2">
-          <a class="btn btn-sm btn-outline-primary cart-link" href="carrito.html">
-            <i class="bi bi-bag"></i> Carrito
-            <span id="cartCount" class="cart-count">0</span>
+          <a class="btn btn-sm btn-ghost cart-link" href="carrito.html">
+            <i class="bi bi-bag"></i> Carrito <span id="cartCount" class="cart-count">0</span>
           </a>
         </li>
       </ul>
@@ -186,39 +214,27 @@
 </nav>
 
 <!-- HERO -->
-<header class="hero text-center">
-  <div class="container">
-    <div class="card border-0 shadow rounded-4 p-4 p-md-5 mx-auto" style="max-width:860px">
-      <h1 class="display-5 fw-bold mb-2">Ramos tejidos, girasoles y detalles que cuentan historias</h1>
-      <p class="lead mb-4">Personalizamos con fotos y temáticas. Entregas rápidas en Asunción y alrededores.</p>
-      <div class="d-flex gap-2 justify-content-center">
-        <a href="#productos" class="btn btn-pri btn-lg"><i class="bi bi-bag-heart me-1"></i> Ver productos</a>
-        <a class="btn-ig" href="https://instagram.com/kuamipy" target="_blank" rel="noopener">
-          <svg class="ig-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <defs><linearGradient id="igG" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#F58529"/><stop offset="30%" stop-color="#FEDA77"/>
-              <stop offset="60%" stop-color="#DD2A7B"/><stop offset="100%" stop-color="#8134AF"/>
-            </linearGradient></defs>
-            <rect x="0" y="0" width="24" height="24" rx="6" fill="url(#igG)"/>
-            <rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="#fff" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4.8" fill="none" stroke="#fff" stroke-width="2"/>
-            <circle cx="17.5" cy="6.5" r="1.5" fill="#fff"/>
-          </svg>
-          Instagram
-        </a>
-      </div>
-      <div class="mt-3 small text-muted">Atención: Lun–Sáb 09:00–18:00</div>
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow"><i class="bi bi-stars"></i> Detalles personalizados</div>
+    <h1 class="hero-title">Ramos tejidos, girasoles y fotos que cuentan historias</h1>
+    <p class="hero-sub">Personalizamos con fotos y temáticas. Entregas rápidas en Asunción y alrededores.</p>
+    <div class="hero-ctas">
+      <a href="#productos" class="btn btn-pri btn-tile"><span class="tile-icon"><i class="bi bi-bag"></i></span><span class="tile-text">Ver productos</span></a>
+      <a class="btn btn-ig btn-tile" href="https://instagram.com/kuamipy" target="_blank" rel="noopener"><span class="tile-icon"><i class="bi bi-instagram"></i></span><span class="tile-text">@kuamipy</span></a>
     </div>
+    <div class="hero-hours"><i class="bi bi-clock"></i> Atención: Lun–Sáb 09:00–18:00</div>
   </div>
 </header>
 
-<!-- PRODUCTOS -->
+<!-- PRODUCTOS DESTACADOS (dinámico: lo llena tu index.js) -->
 <section id="productos">
   <div class="container">
-    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+    <div class="kc-section-header">
       <div>
-        <h2 class="section-title mb-1">Productos destacados</h2>
-        <p class="text-secondary mb-0">Seleccioná una categoría o mirá todo.</p>
+        <div class="kc-section-eyebrow"><i class="bi bi-flower1"></i> Tejidos y personalizados</div>
+        <h2 class="kc-section-title">Productos destacados</h2>
+        <p class="kc-section-sub">Seleccioná una categoría o mirá todo.</p>
       </div>
       <div class="btn-group" role="group" aria-label="Filtros">
         <button class="btn btn-outline-primary filter-pill active" data-filter="all">Todos</button>
@@ -227,258 +243,382 @@
         <button class="btn btn-outline-primary filter-pill" data-filter="personalizados">Personalizados</button>
       </div>
     </div>
-
     <div class="row g-4" id="gridProductos">
-      <!-- 1 -->
       <div class="col-6 col-md-4 col-lg-3 product" data-cat="tejidos personalizados">
         <div class="card product-card rounded-4">
-          <img src="assets/img01.jpg" alt="Tulipanes temáticos" loading="lazy" class="w-100">
+          <img src="assets/productos/img01.jpg" alt="Tulipanes temáticos" loading="lazy" class="w-100">
+          <button type="button" class="pc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Tulipanes temáticos" aria-label="Ver Tulipanes temáticos"><i class="bi bi-zoom-in"></i></button>
           <div class="card-body">
             <h6 class="mb-1">Tulipanes temáticos</h6>
             <div class="small text-secondary">Amigurumi</div>
-            <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
+            <div class="d-flex justify-content-between align-items-center mt-2">
               <span class="price">Gs. 95.000</span>
-              <div class="d-flex gap-1">
-                <button class="btn btn-sm btn-outline-primary btn-add"
-                        data-id="p01" data-name="Tulipanes temáticos" data-price="95000" data-img="assets/img01.jpg">
-                  Agregar
-                </button>
-                <button class="btn btn-sm btn-pri"
-                        data-bs-toggle="modal" data-bs-target="#modalImg"
-                        data-img="assets/img01.jpg" data-title="Tulipanes temáticos">Ver</button>
-              </div>
+            </div>
+            <div class="product-add-row">
+              <div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div>
+              <button class="btn btn-sm btn-pri btn-add" data-id="p01" data-name="Tulipanes temáticos" data-price="95000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button>
             </div>
           </div>
         </div>
       </div>
-      <!-- 2 -->
       <div class="col-6 col-md-4 col-lg-3 product" data-cat="ramos personalizados">
         <div class="card product-card rounded-4">
-          <img src="assets/img02.jpg" alt="Girasol con relicario" loading="lazy" class="w-100">
+          <img src="assets/productos/img02.jpg" alt="Girasol con relicario" loading="lazy" class="w-100">
+          <button type="button" class="pc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img02.jpg" data-title="Girasol con relicario" aria-label="Ver Girasol con relicario"><i class="bi bi-zoom-in"></i></button>
           <div class="card-body">
             <h6 class="mb-1">Girasol con relicario</h6>
             <div class="small text-secondary">Foto personalizada</div>
-            <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
+            <div class="d-flex justify-content-between align-items-center mt-2">
               <span class="price">Gs. 120.000</span>
-              <div class="d-flex gap-1">
-                <button class="btn btn-sm btn-outline-primary btn-add"
-                        data-id="p02" data-name="Girasol con relicario" data-price="120000" data-img="assets/img02.jpg">
-                  Agregar
-                </button>
-                <button class="btn btn-sm btn-pri"
-                        data-bs-toggle="modal" data-bs-target="#modalImg"
-                        data-img="assets/img02.jpg" data-title="Girasol con relicario">Ver</button>
-              </div>
+            </div>
+            <div class="product-add-row">
+              <div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div>
+              <button class="btn btn-sm btn-pri btn-add" data-id="p02" data-name="Girasol con relicario" data-price="120000" data-img="assets/productos/img02.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- 3..12 autogenerados -->
-      <script>
-        const extra = [
-          {t:'Mini bouquet',cat:'ramos',p:'75.000'},
-          {t:'Ramo clásico',cat:'ramos',p:'110.000'},
-          {t:'Set foto y corazón',cat:'tejidos',p:'85.000'},
-          {t:'Ramo premium',cat:'ramos personalizados',p:'190.000'},
-          {t:'Fotos con Colgantes',cat:'tejidos',p:'45.000'},
-          {t:'Caja Corazones',cat:'personalizados',p:'150.000'},
-          {t:'Cuadros',cat:'personalizados',p:'130.000'},
-          {t:'Cajitas sorpresas',cat:'personalizados',p:'140.000'},
-          {t:'Calendarios',cat:'tejidos',p:'80.000'},
-          {t:'Cajas y flores',cat:'tejidos',p:'95.000'}
-        ];
-        document.addEventListener('DOMContentLoaded', () => {
-          const grid = document.getElementById('gridProductos');
-          extra.forEach((e,i)=>{
-            const n = String(i+3).padStart(2,'0');
-            const priceNum = parseInt(e.p.replace(/\D/g,''),10) || 0;
-            const col = document.createElement('div');
-            col.className = 'col-6 col-md-4 col-lg-3 product';
-            col.dataset.cat = e.cat;
-            col.innerHTML = `
-              <div class="card product-card rounded-4">
-                <img src="assets/img${n}.jpg" alt="${e.t}" loading="lazy" class="w-100">
-                <div class="card-body">
-                  <h6 class="mb-1">${e.t}</h6>
-                  <div class="small text-secondary text-truncate">${e.cat}</div>
-                  <div class="d-flex justify-content-between align-items-center mt-2 gap-1">
-                    <span class="price">Gs. ${e.p}</span>
-                    <div class="d-flex gap-1">
-                      <button class="btn btn-sm btn-outline-primary btn-add"
-                              data-id="p${n}" data-name="${e.t}" data-price="${priceNum}" data-img="assets/img${n}.jpg">
-                        Agregar
-                      </button>
-                      <button class="btn btn-sm btn-pri"
-                              data-bs-toggle="modal" data-bs-target="#modalImg"
-                              data-img="assets/img${n}.jpg" data-title="${e.t}">Ver</button>
-                    </div>
-                  </div>
-                </div>
-              </div>`;
-            grid.appendChild(col);
-          });
-        });
-      </script>
     </div>
   </div>
 </section>
 
-<!-- PROMOS -->
-<section id="promos" class="bg-light">
+<!-- BANDA CATÁLOGO -->
+<section id="catalogo" class="sec-band kc-catalog-hero">
   <div class="container">
-    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-      <div><h2 class="section-title mb-1">Promociones</h2><p class="text-secondary mb-0">Stock limitado. Pedidos por WhatsApp.</p></div>
-      <div class="small text-muted">Termina en <span id="countdown" class="count fw-bold"></span></div>
-    </div>
+    <div class="kc-star"><i class="bi bi-stars"></i></div>
+    <h2>TODOS NUESTROS PRODUCTOS</h2>
+    <p>@KUAMIPY</p>
+  </div>
+</section>
 
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img03.jpg" class="rounded-top-4 w-100" alt="Promo 1" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge badge-save">Ahorra 15%</span>
-            <h5 class="mt-2 mb-1">Duo Tulipanes</h5>
-            <p class="text-secondary mb-3">Incluye tarjeta dedicatoria.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="text-decoration-line-through text-muted me-2">Gs. 110.000</span><span class="price">Gs. 93.500</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%20Duo%20Tulipanes">Pedir</a>
-            </div>
-          </div>
-        </div>
+<!-- POLAROIDS NORMALES -->
+<section id="polaroids-normales">
+  <div class="container">
+    <div class="kc-info-banner">
+      <i class="bi bi-info-circle-fill"></i>
+      <span><strong>Antes de pedir:</strong> evitá imágenes oscuras o con bordes negros. Las horizontales se voltean a vertical. No usamos screenshots ni collages. Enviá imágenes centradas.</span>
+    </div>
+  </div>
+  <div class="container" style="margin-top:28px">
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-image"></i> Papel fotográfico</div>
+        <h2 class="kc-section-title">Polaroids normales</h2>
+        <p class="kc-section-sub">Tocá una tarjeta para ver los precios y agregar al carrito.</p>
       </div>
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img04.jpg" class="rounded-top-4 w-100" alt="Promo 2" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge bg-warning text-dark">2x1</span>
-            <h5 class="mt-2 mb-1">Mini bouquets</h5>
-            <p class="text-secondary mb-3">El segundo al 50%.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="price">Gs. 75.000</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%20Mini%20bouquets">Pedir</a>
-            </div>
-          </div>
-        </div>
+    </div>
+    <div class="kc-grid">
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Ver precios de Polaroid case 5x7">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Polaroid case 5x7"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Polaroid case 5x7" aria-label="Ver Polaroid case 5x7"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Normal</span><h3 class="kc-name">Polaroid case</h3><div class="kc-size">5 x 7 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 1.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Polaroid case &middot; 5x7 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 2.000</b></li><li><span>Combo de 16</span><b>Gs. 20.000</b></li><li><span>Desde 100 uni.</span><b>Gs. 1.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="pol-case" data-name="Polaroid case 5x7" data-price="2000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Ver precios de Polaroid mediano 10x6">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Polaroid mediano 10x6"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Polaroid mediano 10x6" aria-label="Ver Polaroid mediano 10x6"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Normal</span><h3 class="kc-name">Polaroid mediano</h3><div class="kc-size">10 x 6 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 2.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Polaroid mediano &middot; 10x6 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 5.000</b></li><li><span>Combo de 8</span><b>Gs. 25.000</b></li><li><span>Desde 100 uni.</span><b>Gs. 2.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="pol-mediano" data-name="Polaroid mediano 10x6" data-price="5000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Ver precios de Polaroid grande 14x10">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Polaroid grande 14x10"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Polaroid grande 14x10" aria-label="Ver Polaroid grande 14x10"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Normal</span><h3 class="kc-name">Polaroid grande</h3><div class="kc-size">14 x 10 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 5.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Polaroid grande &middot; 14x10 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 7.000</b></li><li><span>Combo de 8</span><b>Gs. 50.000</b></li><li><span>Desde 100 uni.</span><b>Gs. 5.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="pol-grande" data-name="Polaroid grande 14x10" data-price="7000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Ver precios de Tira de fotos 15x5">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Tira de fotos 15x5"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Tira de fotos 15x5" aria-label="Ver Tira de fotos 15x5"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Normal</span><h3 class="kc-name">Tira de fotos</h3><div class="kc-size">15 x 5 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 5.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Tira de fotos &middot; 15x5 cm</h3>
+          <ul class="kc-prices"><li><span>Unitaria</span><b>Gs. 5.000</b></li><li><span>Combo de 5 tiras</span><b>Gs. 15.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="tira-normal" data-name="Tira de fotos 15x5" data-price="5000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+    </div>
+  </div>
+</section>
+
+<!-- POLAROIDS IMANTADOS -->
+<section id="polaroids-imantados" class="sec-tint">
+  <div class="container">
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-magnet"></i> Con lámina imantada</div>
+        <h2 class="kc-section-title">Polaroids imantados</h2>
+        <p class="kc-section-sub">Ideales para heladeras y superficies metálicas.</p>
       </div>
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img05.jpg" class="rounded-top-4 w-100" alt="Promo 3" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge bg-info text-dark">Nuevo</span>
-            <h5 class="mt-2 mb-1">Girasol + relicario</h5>
-            <p class="text-secondary mb-3">Personaliza con foto.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="price">Gs. 120.000</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20Girasol%20con%20relicario">Pedir</a>
-            </div>
-          </div>
-        </div>
-      </div>
+    </div>
+    <div class="kc-grid">
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Imán case 5x7">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Imán case 5x7"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Imán case 5x7" aria-label="Ver Imán case 5x7"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Imantado</span><h3 class="kc-name">Imán case</h3><div class="kc-size">5 x 7 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 5.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Imán case &middot; 5x7 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 5.000</b></li><li><span>Combo de 8</span><b>Gs. 30.000</b></li><li><span>Combo de 16</span><b>Gs. 50.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="iman-case" data-name="Imán case 5x7" data-price="5000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Imán mediano 10x6">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Imán mediano 10x6"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Imán mediano 10x6" aria-label="Ver Imán mediano 10x6"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Imantado</span><h3 class="kc-name">Imán mediano</h3><div class="kc-size">10 x 6 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 8.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Imán mediano &middot; 10x6 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 8.000</b></li><li><span>Combo de 8</span><b>Gs. 50.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="iman-mediano" data-name="Imán mediano 10x6" data-price="8000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Imán cuadrado 9x9">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Imán cuadrado 9x9"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Imán cuadrado 9x9" aria-label="Ver Imán cuadrado 9x9"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Imantado</span><h3 class="kc-name">Imán cuadrado</h3><div class="kc-size">9 x 9 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 9.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Imán cuadrado &middot; 9x9 cm</h3>
+          <ul class="kc-prices"><li><span>Unitario</span><b>Gs. 9.000</b></li><li><span>Combo de 8</span><b>Gs. 50.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="iman-cuadrado" data-name="Imán cuadrado 9x9" data-price="9000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Tira imantada 15x5">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Tira imantada 15x5"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Tira imantada 15x5" aria-label="Ver Tira imantada 15x5"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Imantado</span><h3 class="kc-name">Tira imantada</h3><div class="kc-size">15 x 5 cm</div>
+            <div class="kc-from"><span>desde <b>Gs. 7.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver precios</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Tira imantada &middot; 15x5 cm</h3>
+          <ul class="kc-prices"><li><span>Unitaria</span><b>Gs. 7.000</b></li><li><span>Combo de 5</span><b>Gs. 35.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="tira-iman" data-name="Tira imantada 15x5" data-price="7000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
     </div>
   </div>
 </section>
 
 <!-- COMBOS -->
-<section id="combos" class="bg-light">
+<section id="combos">
   <div class="container">
-    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-      <div><h2 class="section-title mb-1">Combos</h2><p class="text-secondary mb-0">HAZ TU PEDIDO!.</p></div>
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-box-seam"></i> Listos para colgar</div>
+        <h2 class="kc-section-title">Combos armados</h2>
+        <p class="kc-section-sub">Polaroids + pinzas + luz led o hilo.</p>
+      </div>
     </div>
+    <div class="kc-grid">
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Combo led case">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Combo led case"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Combo led case" aria-label="Ver Combo led case"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Combo led</span><h3 class="kc-name">Combo led &middot; case</h3><div class="kc-size">16 case + 16 pinzas + luz led</div>
+            <div class="kc-from"><b>Gs. 35.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Combo led &middot; case</h3>
+          <ul class="kc-prices"><li><span>16 case + 16 pinzas + luz led</span><b>Gs. 35.000</b></li><li><span>1 luz led</span><b>Gs. 10.000</b></li><li><span>Pinzas</span><b>Gs. 1.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="combo-led-case" data-name="Combo led case" data-price="35000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
 
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Combo led mediano">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Combo led mediano"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Combo led mediano" aria-label="Ver Combo led mediano"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Combo led</span><h3 class="kc-name">Combo led &middot; mediano</h3><div class="kc-size">8 medianos + 8 pinzas + luz led</div>
+            <div class="kc-from"><b>Gs. 45.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Combo led &middot; mediano</h3>
+          <ul class="kc-prices"><li><span>8 medianos + 8 pinzas + luz led</span><b>Gs. 45.000</b></li><li><span>1 luz led</span><b>Gs. 10.000</b></li><li><span>Pinzas</span><b>Gs. 1.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="combo-led-mediano" data-name="Combo led mediano" data-price="45000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Combo hilo case">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Combo hilo case"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Combo hilo case" aria-label="Ver Combo hilo case"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Combo hilo</span><h3 class="kc-name">Combo hilo &middot; case</h3><div class="kc-size">16 case + 16 pinzas + 1 m hilo</div>
+            <div class="kc-from"><b>Gs. 29.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Combo hilo &middot; case</h3>
+          <ul class="kc-prices"><li><span>16 case + 16 pinzas + 1 m hilo</span><b>Gs. 29.000</b></li><li><span>1 metro de hilo</span><b>Gs. 5.000</b></li><li><span>Pinzas</span><b>Gs. 1.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="combo-hilo-case" data-name="Combo hilo case" data-price="29000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Combo hilo mediano">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Combo hilo mediano"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Combo hilo mediano" aria-label="Ver Combo hilo mediano"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Combo hilo</span><h3 class="kc-name">Combo hilo &middot; mediano</h3><div class="kc-size">8 medianos + 8 pinzas + 1 m hilo</div>
+            <div class="kc-from"><b>Gs. 34.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Combo hilo &middot; mediano</h3>
+          <ul class="kc-prices"><li><span>8 medianos + 8 pinzas + 1 m hilo</span><b>Gs. 34.000</b></li><li><span>1 metro de hilo</span><b>Gs. 5.000</b></li><li><span>Pinzas</span><b>Gs. 1.000 c/u</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="combo-hilo-mediano" data-name="Combo hilo mediano" data-price="34000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+    </div>
+  </div>
+</section>
+
+<!-- EXTRAS -->
+<section id="extras" class="sec-tint">
+  <div class="container">
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-gift"></i> Accesorios</div>
+        <h2 class="kc-section-title">Extras</h2>
+        <p class="kc-section-sub">Para completar tu regalo o pedido.</p>
+      </div>
+    </div>
+    <div class="kc-grid">
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Relicario">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Relicario"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Relicario" aria-label="Ver Relicario"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Relicario</h3><div class="kc-size">2 fotos &middot; plateado</div>
+            <div class="kc-from"><b>Gs. 50.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Relicario</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 50.000</b></li></ul><p class="kc-note">Capacidad para 2 fotos. Único modelo plateado, acero inoxidable.</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="relicario" data-name="Relicario" data-price="50000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Llavero álbum">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Llavero álbum"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Llavero álbum" aria-label="Ver Llavero álbum"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Llavero tipo álbum</h3><div class="kc-size">8 o 16 fotos</div>
+            <div class="kc-from"><span>desde <b>Gs. 32.000</b></span><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Llavero tipo álbum</h3>
+          <ul class="kc-prices"><li><span>Con 8 fotos</span><b>Gs. 32.000</b></li><li><span>Con 16 fotos</span><b>Gs. 39.000</b></li></ul></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="llavero-album" data-name="Llavero tipo álbum 8 fotos" data-price="32000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Broche">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Broche"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Broche" aria-label="Ver Broche"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Broche</h3><div class="kc-size">Para ramos y prendas</div>
+            <div class="kc-from"><b>Gs. 50.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Broche</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 50.000</b></li></ul><p class="kc-note">Ideal para decorar ramos, prendas y detalles.</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="broche" data-name="Broche" data-price="50000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Porta fotos">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Porta fotos"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Porta fotos" aria-label="Ver Porta fotos"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Porta fotos</h3><div class="kc-size">Madera &middot; nube &middot; moño</div>
+            <div class="kc-from"><b>Gs. 15.000</b> c/u<span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Porta fotos</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 15.000 c/u</b></li></ul><p class="kc-note">Diseños disponibles: madera, nube y moño.</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="porta-fotos" data-name="Porta fotos" data-price="15000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Porta foto magnético">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Porta foto magnético"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Porta foto magnético" aria-label="Ver Porta foto magnético"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Porta foto magnético</h3><div class="kc-size">Varios colores</div>
+            <div class="kc-from"><b>Gs. 15.000</b> c/u<span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Porta foto magnético</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 15.000 c/u</b></li></ul><p class="kc-note">Consultá colores disponibles.</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="porta-magnetico" data-name="Porta foto magnético" data-price="15000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Caja blanca">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Caja blanca"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Caja blanca" aria-label="Ver Caja blanca"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Caja blanca</h3><div class="kc-size">Papel picado + moño</div>
+            <div class="kc-from"><b>Gs. 7.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Caja blanca</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 7.000</b></li></ul><p class="kc-note">Incluye papel picado y moño verde. Podés agregar imagen en la tapa.</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="caja-blanca" data-name="Caja blanca" data-price="7000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Caja transparente">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Caja transparente"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Caja transparente" aria-label="Ver Caja transparente"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Caja transparente</h3><div class="kc-size">Sólo case 5x7</div>
+            <div class="kc-from"><b>Gs. 15.000</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Detalle</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Caja transparente</h3>
+          <ul class="kc-prices"><li><span>Precio</span><b>Gs. 15.000</b></li></ul><p class="kc-note">Sólo para polaroids tamaño case (5x7 cm).</p></div>
+          <div class="kc-add-row"><div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div><button class="btn-add kc-add" data-id="caja-transparente" data-name="Caja transparente" data-price="15000" data-img="assets/productos/img01.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button></div></div>
+      </div></article>
+
+      <article class="kc-card"><div class="kc-flip" tabindex="0" role="button" aria-label="Álbum de fotos">
+        <div class="kc-face kc-front"><div class="kc-media"><img src="assets/productos/img01.jpg" alt="Álbum de fotos"><button type="button" class="kc-zoom" data-bs-toggle="modal" data-bs-target="#modalImg" data-img="assets/productos/img01.jpg" data-title="Álbum de fotos" aria-label="Ver Álbum de fotos"><i class="bi bi-zoom-in"></i></button></div>
+          <div class="kc-front-body"><span class="kc-tag">Extra</span><h3 class="kc-name">Álbum de fotos</h3><div class="kc-size">Case &middot; 64 fotos</div>
+            <div class="kc-from">Precio <b>a consultar</b><span class="kc-flip-hint"><i class="bi bi-arrow-repeat"></i> Ver</span></div></div></div>
+        <div class="kc-face kc-back"><div class="kc-back-top"><h3 class="kc-back-name">Álbum de fotos</h3>
+          <ul class="kc-prices"><li><span>Precio y colores</span><b>A consultar</b></li></ul><p class="kc-note">Sólo para polaroids tamaño case. Capacidad 64 fotos.</p></div>
+          <a class="kc-add is-consulta" href="https://wa.me/595984024413?text=Hola%2C%20quiero%20consultar%20por%20el%20album%20de%20fotos" target="_blank" rel="noopener"><i class="bi bi-whatsapp me-1"></i>Consultar por WhatsApp</a></div>
+      </div></article>
+    </div>
+  </div>
+</section>
+
+<!-- PROMOS (mantiene tu #countdown) -->
+<section id="promos">
+  <div class="container">
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-lightning-charge"></i> Stock limitado</div>
+        <h2 class="kc-section-title">Promociones</h2>
+        <p class="kc-section-sub">Pedidos por WhatsApp.</p>
+      </div>
+      <span class="countdown-chip"><i class="bi bi-clock-history"></i> Termina en <span id="countdown">—</span></span>
+    </div>
     <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img13.jpg" class="rounded-top-4 w-100" alt="25 Fotos Polaroid 5x7" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge badge-save">A partir de 2 ahorra 5%</span>
-            <h5 class="mt-2 mb-1">25 Fotos Polaroid</h5>
-            <p class="text-secondary mb-3">Tamaño 5×7 cm.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="text-decoration-line-through text-muted me-2">Gs. 35.000</span><span class="price">Gs. 30.000</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20la%20Promo%2025%20Polaroid%205x7">Pedir</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img15.jpg" class="rounded-top-4 w-100" alt="25 Fotos Polaroid 7x9" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge badge-save">Delivery gratis con 3 pedidos</span>
-            <h5 class="mt-2 mb-1">25 Fotos Polaroid</h5>
-            <p class="text-secondary mb-3">Tamaño 7×9 cm.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="price">Gs. 50.000</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%2025%20Polaroid%207x9">Pedir</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card promo rounded-4 h-100">
-          <img src="assets/img14.jpg" class="rounded-top-4 w-100" alt="Foto Póster 30 cm" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
-          <div class="card-body">
-            <span class="badge bg-info text-dark">Nuevo</span>
-            <h5 class="mt-2 mb-1">Foto Póster</h5>
-            <p class="text-secondary mb-3">Tamaño 30 cm.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div><span class="price">Gs. 80.000</span></div>
-              <a class="btn btn-pri btn-sm" target="_blank" rel="noopener" href="https://wa.me/595XXXXXXXXX?text=Hola%20quiero%20Foto%20Póster%2030%20cm">Pedir</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="col-md-4"><div class="card promo rounded-4 h-100">
+        <img src="assets/productos/img03.jpg" class="rounded-top-4 w-100" alt="Promo Duo Tulipanes" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+        <div class="card-body"><span class="badge badge-save">Ahorra 15%</span><h5 class="mt-2 mb-1">Duo Tulipanes</h5><p class="text-secondary mb-3">Incluye tarjeta dedicatoria.</p>
+          <div class="d-flex justify-content-between align-items-center mb-2"><span class="text-decoration-line-through text-muted me-2">Gs. 110.000</span><span class="price">Gs. 93.500</span></div>
+          <div class="product-add-row">
+            <div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div>
+            <button class="btn btn-pri btn-sm btn-add" data-id="promo-duo-tulipanes" data-name="Promo Duo Tulipanes" data-price="93500" data-img="assets/productos/img03.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button>
+          </div></div>
+      </div></div>
+      <div class="col-md-4"><div class="card promo rounded-4 h-100">
+        <img src="assets/productos/img04.jpg" class="rounded-top-4 w-100" alt="Mini bouquets" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+        <div class="card-body"><span class="badge bg-warning text-dark">2x1</span><h5 class="mt-2 mb-1">Mini bouquets</h5><p class="text-secondary mb-3">El segundo al 50%.</p>
+          <div class="d-flex justify-content-between align-items-center mb-2"><span class="price">Gs. 75.000</span></div>
+          <div class="product-add-row">
+            <div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div>
+            <button class="btn btn-pri btn-sm btn-add" data-id="promo-mini-bouquets" data-name="Promo Mini bouquets" data-price="75000" data-img="assets/productos/img04.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button>
+          </div></div>
+      </div></div>
+      <div class="col-md-4"><div class="card promo rounded-4 h-100">
+        <img src="assets/productos/img05.jpg" class="rounded-top-4 w-100" alt="Girasol con relicario" loading="lazy" style="aspect-ratio:16/10;object-fit:cover">
+        <div class="card-body"><span class="badge bg-info text-dark">Nuevo</span><h5 class="mt-2 mb-1">Girasol + relicario</h5><p class="text-secondary mb-3">Personaliza con foto.</p>
+          <div class="d-flex justify-content-between align-items-center mb-2"><span class="price">Gs. 120.000</span></div>
+          <div class="product-add-row">
+            <div class="qty-stepper"><button type="button" class="qty-btn qty-minus" aria-label="Restar">&minus;</button><input type="number" class="qty-input" value="1" min="1" inputmode="numeric" aria-label="Cantidad"><button type="button" class="qty-btn qty-plus" aria-label="Sumar">+</button></div>
+            <button class="btn btn-pri btn-sm btn-add" data-id="promo-girasol-relicario" data-name="Promo Girasol + relicario" data-price="120000" data-img="assets/productos/img05.jpg"><i class="bi bi-bag-plus me-1"></i>Agregar al carrito</button>
+          </div></div>
+      </div></div>
     </div>
   </div>
 </section>
 
 <!-- INSTAGRAM -->
-<section id="instagram">
+<section id="instagram" class="sec-tint">
   <div class="container">
-    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
-      <div><h2 class="section-title mb-1">Instagram</h2><p class="text-secondary mb-0">@Kuami</p></div>
-      <a class="btn btn-ghost" href="https://www.instagram.com/tu_usuario" target="_blank" rel="noopener"><i class="bi bi-instagram me-1"></i>Ver perfil</a>
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-instagram"></i> Seguinos</div>
+        <h2 class="kc-section-title">Instagram</h2>
+        <p class="kc-section-sub">@kuamipy</p>
+      </div>
+      <a class="btn btn-ghost" href="https://www.instagram.com/kuamipy" target="_blank" rel="noopener"><i class="bi bi-instagram me-1"></i>Ver perfil</a>
     </div>
-    <div class="row g-3">
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img06.jpg" alt="Post 1" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img07.jpg" alt="Post 2" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img08.jpg" alt="Post 3" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img09.jpg" alt="Post 4" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img10.jpg" alt="Post 5" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img11.jpg" alt="Post 6" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img12.jpg" alt="Post 7" loading="lazy"></div>
-      <div class="col-6 col-md-3"><img class="ig-img w-100" src="assets/img02.jpg"  alt="Post 8" loading="lazy"></div>
+    <div class="ig-grid">
+      <img class="ig-img w-100" src="assets/productos/img06.jpg" alt="Post 1" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img07.jpg" alt="Post 2" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img08.jpg" alt="Post 3" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img09.jpg" alt="Post 4" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img10.jpg" alt="Post 5" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img11.jpg" alt="Post 6" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img12.jpg" alt="Post 7" loading="lazy">
+      <img class="ig-img w-100" src="assets/productos/img02.jpg" alt="Post 8" loading="lazy">
     </div>
   </div>
 </section>
 
 <!-- CONTACTO -->
-<section id="contacto" class="bg-light">
+<section id="contacto">
   <div class="container">
-    <h2 class="section-title mb-4">Contacto</h2>
+    <div class="kc-section-header">
+      <div>
+        <div class="kc-section-eyebrow"><i class="bi bi-chat-dots"></i> Hablemos</div>
+        <h2 class="kc-section-title">Contacto</h2>
+      </div>
+    </div>
     <div class="row g-4">
       <div class="col-lg-7">
         <div class="card contact-card rounded-4 p-4">
           <form class="needs-validation" novalidate>
             <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Nombre</label>
-                <input type="text" class="form-control" required>
-                <div class="invalid-feedback">Escribe tu nombre.</div>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" required>
-                <div class="invalid-feedback">Ingresa un número válido.</div>
-              </div>
-              <div class="col-12">
-                <label class="form-label">Mensaje</label>
-                <textarea class="form-control" rows="4" required></textarea>
-                <div class="invalid-feedback">Cuéntanos qué necesitas.</div>
-              </div>
+              <div class="col-md-6"><label class="form-label">Nombre</label><input type="text" class="form-control" required><div class="invalid-feedback">Escribe tu nombre.</div></div>
+              <div class="col-md-6"><label class="form-label">Teléfono</label><input type="tel" class="form-control" required><div class="invalid-feedback">Ingresá un número válido.</div></div>
+              <div class="col-12"><label class="form-label">Mensaje</label><textarea class="form-control" rows="4" required></textarea><div class="invalid-feedback">Contanos qué necesitás.</div></div>
             </div>
-            <div class="d-flex gap-2 mt-3">
+            <div class="d-flex gap-2 mt-3 flex-wrap">
               <button type="submit" class="btn btn-pri"><i class="bi bi-send me-1"></i>Enviar</button>
               <a class="btn btn-success" target="_blank" rel="noopener" href="https://wa.me/595984024413?text=Hola%2C%20quiero%20un%20presupuesto"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>
               <a class="btn btn-ghost" target="_blank" rel="noopener" href="mailto:tucorreo@dominio.com?subject=Consulta%20desde%20la%20web">Email</a>
@@ -489,13 +629,9 @@
       <div class="col-lg-5">
         <div class="rounded-4 p-4 h-100" style="background:linear-gradient(180deg,#fff,var(--soft))">
           <h5 class="fw-bold">Horarios</h5>
-          <ul class="list-unstyled mb-4">
-            <li>Lun–Vie: 09:00–18:00</li>
-            <li>Sábados: 09:00–13:00</li>
-          </ul>
-          <h5 class="fw-bold">Ubicación</h5>
-          <p>Asunción, Paraguay</p>
-          <iframe title="Mapa" class="w-100 rounded-4" height="220" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Asunci%C3%B3n%2C%20Paraguay&output=embed"></iframe>
+          <ul class="list-unstyled mb-4"><li><i class="bi bi-clock me-2 text-success"></i>Lun–Vie: 09:00–18:00</li><li><i class="bi bi-clock me-2 text-success"></i>Sábados: 09:00–13:00</li></ul>
+          <h5 class="fw-bold">Ubicación</h5><p>Asunción, Paraguay</p>
+          <iframe title="Mapa" class="w-100 rounded-4" height="200" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Asunci%C3%B3n%2C+Paraguay&output=embed"></iframe>
         </div>
       </div>
     </div>
@@ -506,12 +642,9 @@
 <footer class="pt-5 pb-4">
   <div class="container">
     <div class="row g-4 align-items-center">
-      <div class="col-md-6">
-        <h5 class="mb-1">Tienda de Detalles</h5>
-        <div class="small">Hecho con cariño. Pagos por transferencia y efectivo.</div>
-      </div>
+      <div class="col-md-6"><h5 class="mb-1">Kuami</h5><div class="small">Hecho con cariño. Pagos por transferencia y efectivo.</div></div>
       <div class="col-md-6 text-md-end">
-        <a class="me-3" href="https://www.instagram.com/tu_usuario" target="_blank" rel="noopener"><i class="bi bi-instagram"></i> Instagram</a>
+        <a class="me-3" href="https://www.instagram.com/kuamipy" target="_blank" rel="noopener"><i class="bi bi-instagram"></i> Instagram</a>
         <a class="me-3" href="https://wa.me/595984024413" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
         <span class="small d-block d-md-inline mt-2 mt-md-0">© <span id="yy"></span></span>
       </div>
@@ -519,133 +652,18 @@
   </div>
 </footer>
 
-<!-- MODAL IMG -->
-<div class="modal fade" id="modalImg" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content border-0 rounded-4">
-      <div class="modal-header border-0">
-        <h5 class="modal-title"></h5>
-        <button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body pt-0">
-        <img src="" alt="" class="w-100 rounded-4" style="aspect-ratio:16/10;object-fit:cover">
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Toast -->
 <div class="toast-container position-fixed top-0 end-0 p-3">
   <div id="addToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMsg">Agregado al carrito</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
-    </div>
+    <div class="d-flex"><div class="toast-body" id="toastMsg">Agregado al carrito</div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button></div>
   </div>
 </div>
 
 <!-- FAB WhatsApp -->
-<a class="wa-fab" href="https://wa.me/595984024413?text=Hola%2C%20vengo%20de%20la%20web" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <i class="bi bi-whatsapp fs-3"></i>
-</a>
+<a class="wa-fab" href="https://wa.me/595984024413?text=Hola%2C%20vengo%20de%20la%20web" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="bi bi-whatsapp fs-3"></i></a>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  /* ===== Utilidades carrito ===== */
-  const CART_KEY = 'carritoKuami';
-  const getCart = () => JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-  const setCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
-  const formatGs = n => 'Gs. ' + (n||0).toLocaleString('es-PY');
-
-  const updateBadge = () => {
-    const n = getCart().reduce((a,i)=>a + (i.qty||0), 0);
-    const b = document.getElementById('cartCount');
-    if(b){ b.textContent = n }
-  };
-
-  const showToast = (msg='Agregado al carrito') => {
-    const el = document.getElementById('addToast');
-    document.getElementById('toastMsg').textContent = msg;
-    const t = new bootstrap.Toast(el, { delay: 1500 });
-    t.show();
-  };
-
-  const addToCart = (item) => {
-    const cart = getCart();
-    const found = cart.find(p => p.id === item.id);
-    if(found){ found.qty += 1 }
-    else { cart.push({...item, qty: 1}) }
-    setCart(cart);
-    updateBadge();
-    showToast(`${item.name} agregado`);
-  };
-
-  /* ===== Navbar shrink ===== */
-  const nav = document.querySelector('.navbar');
-  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
-  document.addEventListener('scroll', onScroll); onScroll();
-
-  /* ===== Filtros ===== */
-  document.querySelectorAll('.filter-pill').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.filter-pill').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.filter;
-      document.querySelectorAll('#gridProductos .product').forEach(card=>{
-        const has = card.dataset.cat.toLowerCase().includes(cat);
-        card.classList.toggle('d-none', cat!=='all' && !has);
-      });
-    });
-  });
-
-  /* ===== Modal imagen ===== */
-  const modal = document.getElementById('modalImg');
-  modal.addEventListener('show.bs.modal', e=>{
-    const b = e.relatedTarget;
-    modal.querySelector('.modal-title').textContent = b.getAttribute('data-title') || 'Producto';
-    modal.querySelector('img').src = b.getAttribute('data-img');
-    modal.querySelector('img').alt = b.getAttribute('data-title') || 'Producto';
-  });
-
-  /* ===== Validación formulario ===== */
-  (()=> {
-    const form = document.querySelector('.needs-validation');
-    form.addEventListener('submit', ev=>{
-      if(!form.checkValidity()){ev.preventDefault();ev.stopPropagation();}
-      form.classList.add('was-validated');
-    }, false);
-  })();
-
-  /* ===== Countdown 7 días ===== */
-  const end = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+7, 23,59,59);
-  const out = document.getElementById('countdown');
-  setInterval(()=>{
-    const s = Math.max(0, Math.floor((end - new Date())/1000));
-    const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), ss = s%60;
-    out.textContent = `${String(d).padStart(2,'0')}d:${String(h).padStart(2,'0')}h:${String(m).padStart(2,'0')}m:${String(ss).padStart(2,'0')}s`;
-  },1000);
-
-  /* ===== Año footer ===== */
-  document.getElementById('yy').textContent = new Date().getFullYear();
-
-  /* ===== Delegación: Agregar al carrito ===== */
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.btn-add');
-    if(!btn) return;
-    const price = parseInt(btn.dataset.price,10) || 0;
-    addToCart({
-      id: btn.dataset.id,
-      name: btn.dataset.name,
-      price,
-      img: btn.dataset.img
-    });
-  });
-
-
-
-
-  /* ===== Inicializar badge al cargar ===== */
-  document.addEventListener('DOMContentLoaded', updateBadge);
-</script>
+<script src="js/pages/index.js"></script>
 </body>
 </html>

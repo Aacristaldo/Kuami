@@ -1,0 +1,72 @@
+/* ============================================================
+   layout.css — Hero, secciones, Instagram, Contacto, Footer
+   ============================================================ */
+
+/* ── Secciones base ── */
+section { padding: 72px 0; }
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  min-height: 82vh;
+  display: grid;
+  place-items: center;
+  background-image:
+    linear-gradient(0deg, rgba(15,23,42,.55), rgba(15,23,42,.35)),
+    url('../../assets/productos/img01.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 35%;
+  background-attachment: scroll;
+}
+@media (min-width: 992px) {
+  .hero {
+    background-position: center center;
+    background-attachment: fixed;
+  }
+}
+.hero .card {
+  backdrop-filter: blur(10px);
+  background: rgba(20,83,45,.22);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+}
+.hero .card h1,
+.hero .card p,
+.hero .card .small { color: #fff !important; }
+.hero .card .text-muted { color: rgba(255,255,255,.85) !important; }
+
+/* ── Filtro pills ── */
+.filter-pill.active {
+  background: var(--pri-lt) !important;
+  border-color: rgba(20,83,45,.35) !important;
+  color: var(--pri) !important;
+}
+
+/* ── Promos / Combos ── */
+.promo {
+  border: 1px solid rgba(226,232,240,.7);
+  background: linear-gradient(180deg, #fff, rgba(132,204,22,.08));
+}
+
+/* ── Instagram ── */
+.ig-img {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 1rem;
+  transition: transform .2s;
+}
+.ig-img:hover { transform: scale(1.02); }
+
+/* ── Contacto ── */
+.contact-card {
+  border: 1px solid rgba(226,232,240,.8);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Footer ── */
+footer {
+  background: linear-gradient(180deg, #052e16, #041f11);
+  color: rgba(255,255,255,.75);
+}
+footer a { color: rgba(255,255,255,.9); }

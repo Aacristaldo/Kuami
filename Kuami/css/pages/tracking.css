@@ -1,0 +1,180 @@
+/* ============================================================
+   pages/tracking.css — Estilos de seguimiento.html
+   ============================================================ */
+
+.trk-page {
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(255,255,255,.08), transparent 60%),
+    radial-gradient(900px 500px at 80% 20%,  rgba(255,255,255,.06), transparent 55%),
+    #0b0f14;
+  color: #fff;
+  min-height: 100vh;
+}
+.trk-nav {
+  background: rgba(11,15,20,.70);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(12px);
+}
+.trk-nav .nav-link { color: rgba(255,255,255,.85); }
+.trk-nav .nav-link:hover { color: #fff; }
+.trk-nav .nav-link.active { color:#fff; font-weight:800; }
+
+.trk-nav .btn-pri {
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.16);
+  color: #fff;
+}
+.trk-nav .btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.16);
+  color: #fff;
+}
+.trk-nav .btn-ghost:hover { background: rgba(255,255,255,.06); color: #fff; }
+
+.trk-nav .cart-count {
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.16);
+}
+
+.trk-main { padding-top: 90px; }
+
+.trk-hero { padding: 34px 0 18px; }
+.trk-hero-inner {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+}
+.trk-hero h1 { margin:0; font-size:2rem; }
+.trk-hero p  { margin:8px 0 0; color:rgba(255,255,255,.75); max-width:60ch; }
+.trk-hero-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.92); font-weight: 800;
+}
+.trk-section { padding: 18px 0 60px; }
+.trk-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px; padding: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+}
+.trk-label { color: rgba(255,255,255,.9); }
+.trk-input {
+  background: rgba(0,0,0,.28) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: #fff !important;
+  border-radius: 12px; padding: 12px;
+}
+.trk-input::placeholder { color: rgba(255,255,255,.45); }
+.trk-input:focus {
+  box-shadow: 0 0 0 .20rem rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.28) !important;
+}
+.trk-help { color: rgba(255,255,255,.60); display:block; margin-top:6px; }
+.trk-antirobot {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px;
+  padding: 12px; border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.10);
+}
+.trk-ar-left  { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.trk-ar-title { color:rgba(255,255,255,.85); font-weight:800; }
+.trk-ar-q {
+  color:#fff; font-weight:900;
+  padding:6px 10px; border-radius:10px;
+  background:rgba(0,0,0,.28);
+  border:1px dashed rgba(255,255,255,.22);
+}
+.trk-ar-refresh {
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.9);
+  border-radius:10px; padding:6px 10px;
+}
+.trk-ar-refresh:hover { filter:brightness(1.15); }
+.trk-captcha-input { max-width:180px; }
+.trk-btn { border-radius:12px; padding:10px 14px; }
+.trk-hint { color:rgba(255,255,255,.65); display:flex; gap:8px; align-items:center; font-size:.92rem; }
+.trk-msg {
+  margin-top:14px; padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.92);
+}
+.trk-msg.ok  { border-color:rgba(34,197,94,.35);  background:rgba(34,197,94,.10); }
+.trk-msg.err { border-color:rgba(239,68,68,.35);  background:rgba(239,68,68,.10); }
+.trk-result {
+  margin-top:16px; padding:16px;
+  border-radius:16px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.10);
+}
+.trk-result-top {
+  display:flex; align-items:flex-start;
+  justify-content:space-between; gap:14px; margin-bottom:14px;
+}
+.trk-kv { display:flex; gap:8px; }
+.trk-k  { color:rgba(255,255,255,.70); min-width:70px; }
+.trk-v  { color:#fff; font-weight:800; font-family:ui-monospace,monospace; }
+.trk-status-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.92); font-weight:900;
+  text-transform:uppercase; letter-spacing:.04em; font-size:.82rem;
+}
+.trk-status-pill .dot {
+  width:10px; height:10px; border-radius:50%;
+  background:rgba(255,255,255,.65);
+  box-shadow:0 0 0 4px rgba(255,255,255,.10);
+}
+.trk-progress {
+  padding:12px; border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03); margin-bottom:14px;
+}
+.trk-steps {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.trk-step {
+  padding:10px; border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.22); color:rgba(255,255,255,.75);
+  text-align:center; font-size:.88rem;
+}
+.trk-step strong { display:block; color:rgba(255,255,255,.92); font-size:.92rem; }
+.trk-step small  { display:block; margin-top:4px; color:rgba(255,255,255,.58); }
+.trk-step.done   { border-color:rgba(34,197,94,.30); background:rgba(34,197,94,.10); }
+.trk-step.active { border-color:rgba(59,130,246,.35); background:rgba(59,130,246,.12); color:rgba(255,255,255,.92); }
+.trk-meta {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.trk-meta-item {
+  display:flex; gap:10px; align-items:flex-start;
+  padding:12px; border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+}
+.trk-meta-item i    { font-size:1.25rem; opacity:.9; margin-top:2px; }
+.trk-meta-label     { color:rgba(255,255,255,.65); font-size:.86rem; }
+.trk-meta-value     { color:#fff; font-weight:800; }
+.trk-actions        { margin-top:14px; display:flex; justify-content:flex-end; }
+.trk-foot           { margin-top:14px; color:rgba(255,255,255,.55); }
+.trk-foot .mono     { font-family:ui-monospace,monospace; }
+.trk-footer         { border-top:1px solid rgba(255,255,255,.08); padding:18px 0; color:rgba(255,255,255,.60); }
+
+@media (max-width:992px) {
+  .trk-hero-inner { flex-direction:column; }
+  .trk-steps      { grid-template-columns:1fr; }
+  .trk-meta       { grid-template-columns:1fr; }
+  .trk-captcha-input { max-width:100%; }
+}
